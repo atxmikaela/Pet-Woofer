@@ -49,7 +49,7 @@ module.exports = {
     lon: 0,
     phone: "18302576963",
     email: "animalcontrol@co.kerr.tx.us ",
-    website: "https://kerrcountytx.gov/kerr-county-all-departments/kerr-county-animal-services#gsc.tab=0",
+    website: "https://kerrcountytx.gov",
     description: "Kerr County Animal Services enforces ordinances, such as restraint laws, laws concerning rabies vaccinations and city/county registrations, rabies control, cruelty investigations, bite investigations and animal quarantines. We also educate the public about rabies control and local laws."
   },
 ], {});

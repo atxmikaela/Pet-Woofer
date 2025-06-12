@@ -22,7 +22,7 @@ module.exports = {
       },
       address: {
         allowNull:false,
-        type: Sequelize.STRING(30)
+        type: Sequelize.STRING(60)
       },
       city: {
         type: Sequelize.STRING(30),
@@ -33,7 +33,7 @@ module.exports = {
         allowNull: false,
       },
       zip: {
-        type: Sequelize.STRING(2),
+        type: Sequelize.STRING(5),
         allowNull: false
       },
       lat: {
@@ -43,15 +43,15 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       phone: {
-        type: Sequelize.STRING(10),
+        type: Sequelize.STRING(11),
         allowNull: false
       },
       email: {
-        type: Sequelize.STRING(30),
+        type: Sequelize.STRING(60),
         allowNull: false,
       },
       website: {
-        type: Sequelize.STRING(30),
+        type: Sequelize.STRING(60),
         allowNull: false,
       }, 
       description: {

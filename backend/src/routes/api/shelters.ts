@@ -7,6 +7,7 @@ import { Op } from 'sequelize';
 import { dateConverter } from "../../utils/date-conversion";
 import { GoodShelter } from "../../typings/data";
 import { nextTick } from "process";
+import { ForbiddenError, NoResourceError, UnauthorizedError } from "../../errors/customErrors";
 
 
 const {Shelter, User} = db;
@@ -176,5 +177,87 @@ router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => 
 
 //update a shelter
 
+router.put('/:shelterId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
+    try {
+        if(req.params.shelterId){
+            let shelterId = req.params.shelterId;
+
+            if(!req.body) throw new NoResourceError('You must pass in a body to update a Shelter', 500);
+
+            let {newName, newPhone, newEmail, newWebsite, newAddress, newCity, newZip} = req.body;
+        
+
+        const oldShelter = await Shelter.findByPk(shelterId);
+        if(!oldShelter) throw new NoResourceError("Shelter couldn't be found, 404");
+        let {...response} = oldShelter.toJSON();
+
+        //User.id is questionable - should be userId?
+        if(response.userId !== oldShelter.userId){ 
+            throw new UnauthorizedError("You are not authorized to edit this shelter", 401);
+        } else {
+            if(newName && response.name !== newName){
+                oldShelter.name = newName;
+                response.name = newName;
+            }
+            if(newPhone && response.phone !== newPhone){
+                oldShelter.phone = newPhone;
+                response.phone = newPhone;
+            }
+            if(newEmail && response.email !== newEmail){
+                oldShelter.email = newEmail;
+                response.email = newEmail;
+            }
+            if(newWebsite && response.website !== newWebsite){
+                oldShelter.website = newWebsite;
+                response.website = newWebsite;
+            }
+            if(newAddress && response.address !== newAddress){
+                oldShelter.address = newAddress;
+                response.address = newAddress;
+            }
+            if(newCity && response.city !== newCity){
+                oldShelter.city = newCity;
+                response.city = newCity;
+            }
+            if(newZip && response.zip !== newZip){
+                oldShelter.zip = newZip;
+                response.zip = newZip;
+            }
+            await oldShelter.save();
+            res.status(200);
+            res.json(response);
+        }
+
+        } else {
+            throw new NoResourceError("Shelter couldn't be found", 404);
+        }
+    } catch (error) {
+        return res.json({message: error});
+    }
+});
+
+//delete a shelter
+
+    router.delete('/:shelterId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
+
+        try {
+            if(!req.user) throw new UnauthorizedError('You must be signed in to perform this action');
+            let userId = req.user.id;
+            let shelterId: string | number = req.params.shelterId;
+            if(!shelterId) throw new Error('Please pass in a valid shelter id');
+
+            shelterId = Number(shelterId);
+            let shelter = await Shelter.findByPk(shelterId);
+            if(!shelter) throw new NoResourceError("Shelter couldn't be found", 404);
+            let shelterJSON = await shelter.toJSON();
+            if(shelterJSON.userId !== userId) throw new ForbiddenError('Forbidden: This is not your shelter');
+            shelter.destroy();
+            return res.json(shelter);
+        } catch (e) {
+            return next (e);
+        }
+    });
+
+    export = router;
 
 
