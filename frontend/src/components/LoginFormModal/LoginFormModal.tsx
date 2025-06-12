@@ -8,16 +8,14 @@ import { AnyAction } from "redux";
 
 interface IErrors {
   email: string;
-  password:string;
-  phone:string
+  password:string
 }
 
 function LoginFormModal():JSX.Element {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [errors, setErrors] = useState<IErrors | AnyAction>({email: "", phone: "", password: ""});
+  const [errors, setErrors] = useState<IErrors | AnyAction>({email: "", password: ""});
   const { closeModal } = useModal();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -25,7 +23,6 @@ function LoginFormModal():JSX.Element {
     const serverResponse = await dispatch(
       thunkLogin({
         email,
-        phone,
         password,
       })
     );
@@ -51,16 +48,6 @@ function LoginFormModal():JSX.Element {
           />
         </label>
         {errors.email && <p>{errors.email}</p>}
-                <label>
-          Mobile Number
-          <input
-            type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-          />
-        </label>
-        {errors.phone && <p>{errors.phone}</p>}
         <label>
           Password
           <input

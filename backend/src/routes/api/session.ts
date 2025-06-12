@@ -42,7 +42,6 @@ router.post(
                         [Op.or]: {
                             username: credential,
                             email: credential,
-                            phone: credential,
                         },
                     }
                 });

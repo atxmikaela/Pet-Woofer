@@ -8,7 +8,6 @@ import "./SignupForm.css";
 interface ISignUpErrors {
   server?: any;
   email?: string;
-  phone?: string;
   username?: string;
   firstName?: string;
   lastName?: string;
@@ -25,13 +24,11 @@ function SignupFormModal() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState<ISignUpErrors>({
     server: "",
     email: "",
     firstName: "",
     lastName: "",
-    phone: "",
     username: "",
     password: "",
     confirmPassword: ""
@@ -54,8 +51,7 @@ function SignupFormModal() {
         username,
         firstName,
         lastName,
-        phone,
-        password
+        password,
       })
     );
 
@@ -70,7 +66,7 @@ function SignupFormModal() {
     <>
       <h1>Sign Up</h1>
       {errors.server && <p>{errors.server}</p>}
-     <form onSubmit={(e) => handleSubmit(e)}>
+      <form onSubmit={handleSubmit}>
         <label>
           Email
           <input
@@ -80,17 +76,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.phone && <p>{errors.phone}</p>}
-        <label>
-          Mobile Number
-          <input
-            type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-          />
-        </label>
-        {errors.phone && <p>{errors.phone}</p>}
+        {errors.email && <p>{errors.email}</p>}
         <label>
           First Name
           <input

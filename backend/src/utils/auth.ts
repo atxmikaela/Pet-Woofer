@@ -14,7 +14,6 @@ interface ISafeUser {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
   username: string;
 }
 
@@ -24,7 +23,6 @@ export const setMobileToken = (res:Response, user:any) => {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    phone: user.phone,
     username: user.username
   };
 
@@ -50,7 +48,6 @@ export const setTokenCookie = (res:Response, user:any) => {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    phone: user.phone,
     username: user.username
   };
 

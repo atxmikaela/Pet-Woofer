@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import { thunkSignup } from "../../redux/session";
 import { useAppSelector } from "../../redux/store";
@@ -8,7 +8,6 @@ import { useAppSelector } from "../../redux/store";
 interface ISignUpErrors {
   server?: any;
   email?: string;
-  phone?: string;
   username?: string;
   firstName?: string;
   lastName?:string;
@@ -21,7 +20,6 @@ function SignupFormPage() {
   const navigate = useNavigate();
   const sessionUser = useAppSelector((state) => state.session.user);
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -30,7 +28,6 @@ function SignupFormPage() {
   const [errors, setErrors] = useState<ISignUpErrors>({
     server: "",
     email: "",
-    phone: "",
     firstName: "",
     lastName: "",
     username: "",
@@ -53,11 +50,10 @@ function SignupFormPage() {
     const serverResponse = await dispatch(
       thunkSignup({
         email,
-        phone,
         username,
         firstName,
         lastName,
-        password
+        password,
       })
     );
 
@@ -74,7 +70,7 @@ function SignupFormPage() {
     <>
       <h1>Sign Up</h1>
       {errors.server && <p>{errors.server}</p>}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => handleSubmit}>
         <label>
           Email
           <input
@@ -85,16 +81,6 @@ function SignupFormPage() {
           />
         </label>
         {errors.email && <p>{errors.email}</p>}
-        <label>
-          Phone
-          <input
-            type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-          />
-        </label>
-        {errors.phone && <p>{errors.phone}</p>}
         <label>
           Username
           <input

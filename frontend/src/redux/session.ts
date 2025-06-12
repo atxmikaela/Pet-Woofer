@@ -84,7 +84,7 @@ export const restoreUser = () => async (dispatch: any) => {
 };
 
 export const thunkSignup = (user: ISignUpUser): any => async (dispatch: any) => {
-  const { firstName, lastName, email, phone, username, password } = user;
+  const { firstName, lastName, email, username, password } = user;
   try {
     const response = await csrfFetch("/api/users", {
       method: "POST",
@@ -94,7 +94,6 @@ export const thunkSignup = (user: ISignUpUser): any => async (dispatch: any) => 
         password,
         lastName,
         email,
-        phone,
         username,
       }),
     });
@@ -127,11 +126,9 @@ function sessionReducer(state = initialState, action: IActionCreator): SessionIn
   switch (action.type) {
     case SET_USER:
       console.log(action.payload, "payload")
-      newState =  { ...state, user: action.payload };
-      return newState;
+      return { ...state, user: action.payload };
     case REMOVE_USER:
-      newState = { ...state, user: null };
-      return newState;
+      return { ...state, user: null };
     default:
       return state;
   }

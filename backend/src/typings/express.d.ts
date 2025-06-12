@@ -4,7 +4,6 @@ import { Response, Request } from "express";
 export interface SafeUser {
     id: number,
     email: string,
-    phone: string,
     username: string,
     firstName: string,
     lastName: string

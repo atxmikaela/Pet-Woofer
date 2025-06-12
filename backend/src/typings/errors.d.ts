@@ -23,5 +23,4 @@ export interface errors {
     email?: string,
     username?: string,
     password?: string,
-    phone?: string,
 }

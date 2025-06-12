@@ -31,26 +31,20 @@ const validateSignup = [
     check('password')
         .isLength({ min: 6 })
         .withMessage('Password must be 6 characters or more.'),
-    check('phone')
-        .not()
-        .isEmail()
-        .withMessage('Mobile Number cannot be an email.'),
     handleValidationErrors
 ];
 
 // Sign up
 router.post('/', validateSignup, async (req: Request, res: Response, next: NextFunction) => {
-    const { firstName, lastName, email, phone, password, username, isHost } = req.body;
+    const { firstName, lastName, email, password, username, isHost } = req.body;
     const hashedPassword = bcrypt.hashSync(password);
 
-    console.log('phone is: ', phone)
 
     let existingUser = await User.findOne({
         where: {
             [Op.or]: {
                 username,
-                email,
-                phone
+                email
             }
         }
     })
@@ -65,14 +59,11 @@ router.post('/', validateSignup, async (req: Request, res: Response, next: NextF
         if (existingUser.username === username) {
             errors["username"] = "User with that username already exists";
         }
-        if (existingUser.phone === phone) {
-            errors["phone"] = "User with that mobile number already exists";
-        }
         res.status(500)
         return res.json({ message: "User already exists", errors })
     } else {
         try {
-            const user = await User.create({ firstName, lastName, email, phone, username, hashedPassword, isHost: isHost || false });
+            const user = await User.create({ firstName, lastName, email, username, hashedPassword, isHost: isHost || false });
 
             const safeUser = await user.getSafeUser();
 

@@ -16,15 +16,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      email: {
-        type: Sequelize.STRING(256),
-        allowNull: false,
-        unique: true
-      },
-      hashedPassword: {
-        type: Sequelize.STRING.BINARY,
-        allowNull: false
-      },
       firstName: {
         allowNull:false,
         type: Sequelize.STRING(30)
@@ -38,31 +29,14 @@ module.exports = {
         allowNull: false,
         unique: true
       },
-      phone: {
-        allowNull:false,
-        type: Sequelize.STRING(10),
+      email: {
+        type: Sequelize.STRING(256),
+        allowNull: false,
         unique: true
       },
-      role: {
-        allowNull:false,
-        type: Sequelize.STRING(30)
-      },
-      shelterId: {
-        type: Sequelize.INTEGER(),
-        unique: true
-      },
-      isActive: {
-        allowNull:false,
-        type: Sequelize.BOOLEAN()
-      },
-      emailVerified: {
-        allowNull:false,
-        type: Sequelize.BOOLEAN()
-      },
-      lastLogin: {
-        allowNull:false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      hashedPassword: {
+        type: Sequelize.STRING.BINARY,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
