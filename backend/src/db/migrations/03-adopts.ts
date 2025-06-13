@@ -37,13 +37,13 @@ module.exports = {
         allowNull: false
       },
       size: {
-        type: Sequelize.STRING(10),
+        type: Sequelize.STRING(20),
       },
       fee: {
         type: Sequelize.INTEGER,
       },
       status: {
-        type: Sequelize.STRING(11),
+        type: Sequelize.STRING(20),
         allowNull: false
       },
       description: {

@@ -3,54 +3,54 @@ import { Association, CreationOptional, DataTypes, Model, Optional } from 'seque
 
 const { Validator } = require('sequelize');
 
-type ShelterAttributes = {
+type AdoptAttributes = {
     id: number,
     name: string,
-    address: string,
-    city: string,
-    state: string,
-    zip: string,
-    lat: number,
-    lon: number,
-    phone: string,
-    email: string,
-    website: string,
+    species: string,
+    breed: string,
+    age: string,
+    gender: string,
+    size: string,
+    fee: number,
+    status: string,
     description: text,
-    userId: number,
+    shelterId: number,
+    userId: number
 };
 
-type ShelterCreationAttributes = Optional<
-    ShelterAttributes, 'id'>;
+type AdoptCreationAttributes = Optional<
+    AdoptAttributes, 'id'>;
 
 module.exports = (sequelize: any, DataTypes: any) => {
 
-    class Shelter extends Model<ShelterAttributes, ShelterCreationAttributes> {
+    class Adopt extends Model<AdoptAttributes, AdoptCreationAttributes> {
         declare id: CreationOptional<number>;
         declare name: string;
-        declare address: string;
-        declare city: string;
-        declare state: string;
-        declare zip: string;
-        declare lat: number;
-        declare lon: number;
-        declare phone: string;
-        declare email: string;
-        declare website: string;
+        declare species: string;
+        declare breed: string;
+        declare age: string;
+        declare gender: string;
+        declare size: string;
+        declare fee: number;
+        declare status: string;
         declare description: text;
+        declare shelterId: number;
         declare userId: number;
+
 
 
         static associate(models: any) {
             // Associations go here
 
-            Shelter.belongsTo(models.User, { foreignKey: 'userId', as: 'Owner' });
+            Adopt.belongsTo(models.User, { foreignKey: 'userId', as: 'Owner' });
+            Adopt.belongsTo(models.Shelter, { foreignKey: 'shelterId', as: 'Rescue' });
           
         }
         // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 
 
     }
-    Shelter.init(
+    Adopt.init(
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -62,44 +62,44 @@ module.exports = (sequelize: any, DataTypes: any) => {
                 unique: true,
                 allowNull: false
             },
-            address: {
+            species: {
                 type: DataTypes.STRING,
                 allowNull: false
             },
-            city: {
+            breed: {
                 type: DataTypes.STRING,
                 allowNull: false
             },
-            state: {
+            age: {
                 type: DataTypes.STRING,
                 allowNull: false
             },
-            zip: {
+            gender: {
                 type: DataTypes.STRING,
                 allowNull: false
             },
-            lat: {
+            size: {
                 type: DataTypes.INTEGER,
             },
-            lon: {
+            fee: {
                 type: DataTypes.INTEGER,
             },
-            phone: {
+            status: {
                 type: DataTypes.STRING,
                 unique: true,
-                allowNull: false
-            },
-            email: {
-                type: DataTypes.STRING,
-                allowNull: false
-            },
-            website: {
-                type: DataTypes.STRING,
                 allowNull: false
             },
             description: {
                 type: DataTypes.STRING(1000),
                 allowNull: false
+            },
+            shelterId: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'Shelters',
+                    key: 'id'
+                }
             },
             userId: {
                 type: DataTypes.INTEGER,
@@ -108,7 +108,7 @@ module.exports = (sequelize: any, DataTypes: any) => {
                     model: 'Users',
                     key: 'id'
                 }
-            }
+            },
         },
         {
             sequelize,
@@ -120,5 +120,5 @@ module.exports = (sequelize: any, DataTypes: any) => {
             },
         }
     )
-    return Shelter;
+    return Adopt;
 }

@@ -32,6 +32,23 @@ export interface GoodShelter {
     userId: number,
 }
 
+export interface GoodAdopt {
+    id: number,
+    name: string,
+    species: string,
+    breed: string,
+    age: string,
+    gender: string,
+    size: string,
+    fee: number,
+    status: string,
+    description: string,
+    shelterId: number,
+    userId: number,
+    createdAt: string,
+    updatedAt: string,
+}
+
 export interface WhereValues{
     lat?: any,
     lng?: any,
