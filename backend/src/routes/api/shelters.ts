@@ -1,17 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { CustomeRequest } from "../../typings/express";
 import { validateQueryParams } from "../../utils/validation";
-
 import db from '../../db/models';
 import { Op } from 'sequelize';
 import { dateConverter } from "../../utils/date-conversion";
 import { GoodShelter } from "../../typings/data";
-import { nextTick } from "process";
 import { ForbiddenError, NoResourceError, UnauthorizedError } from "../../errors/customErrors";
 
 
 const {Shelter, User} = db;
-const router = require('express').router();
+const router = require('express').Router();
 
 
 // Get all shelters
@@ -38,7 +36,7 @@ router.get('/', validateQueryParams, async(req:Request, res: Response, next: Nex
 
 // Get all shelters owned by current user: 
 
-router.get('/current/:userId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
+router.get('/:userId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
     try {
         const userId = req.params.userId;
         const shelters = await Shelter.findAll({
@@ -67,6 +65,7 @@ router.get('/current/:userId', async(req:CustomeRequest, res: Response, next: Ne
     }
 })
 
+
 router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => {
     try{
         if(!req.body) throw new Error("An error occured processing your request. Please try again");
@@ -92,7 +91,8 @@ router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => 
             phone,
             email,
             website,
-            description
+            description,
+            userId
         } = req.body;
 
         // check to see if shelter exists with name, email, or phone number
@@ -120,6 +120,7 @@ router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => 
             email,
             website,
             description,
+            userId,
     });
     
         if(!newShelter) throw Error("Unable to create a shelter. please try again");
@@ -182,9 +183,9 @@ router.put('/:shelterId', async(req:CustomeRequest, res: Response, next: NextFun
         if(req.params.shelterId){
             let shelterId = req.params.shelterId;
 
-            if(!req.body) throw new NoResourceError('You must pass in a body to update a Shelter', 500);
+            if(!req.body) throw new NoResourceError('You must pass in a body to update a Shelter', 400);
 
-            let {newName, newPhone, newEmail, newWebsite, newAddress, newCity, newZip} = req.body;
+            let {newName, newPhone, newEmail, newWebsite, newAddress, newCity, newState, newZip} = req.body;
         
 
         const oldShelter = await Shelter.findByPk(shelterId);
@@ -219,13 +220,17 @@ router.put('/:shelterId', async(req:CustomeRequest, res: Response, next: NextFun
                 oldShelter.city = newCity;
                 response.city = newCity;
             }
+            if(newState && response.state !== newState){
+                oldShelter.state = newState;
+                response.state = newState;
+            }
             if(newZip && response.zip !== newZip){
                 oldShelter.zip = newZip;
                 response.zip = newZip;
             }
             await oldShelter.save();
             res.status(200);
-            res.json(response);
+            res.json(oldShelter);
         }
 
         } else {

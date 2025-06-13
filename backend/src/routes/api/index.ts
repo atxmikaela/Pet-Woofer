@@ -7,10 +7,11 @@ import db from '../../db/models';
 //imports from router files
 import userRouter from './users';
 import sessionRouter from './session';
+import shelterRouter from './shelters';
 import { ForbiddenError, NoResourceError, UnauthorizedError } from "../../errors/customErrors";
 import csurf from "csurf";
 
-const{User, SpotImage, ReviewImage, Review, Spot} = db;
+const{User, Shelter} = db;
 const router = require('express').Router();
 const { environment } = require('../../config');
 const isProduction = environment === 'production';
@@ -28,6 +29,7 @@ router.use(
 );
 router.use('/session', sessionRouter);
 router.use('/users', userRouter);
+router.use('/shelters', shelterRouter);
 
 
 

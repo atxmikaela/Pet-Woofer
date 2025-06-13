@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'production') {
 
 module.exports = {
   up: async (queryInterface:any, Sequelize:any) => {
-    return queryInterface.createTable("Shelters", {
+    return queryInterface.createTable("Adopts", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -20,40 +20,32 @@ module.exports = {
         allowNull:false,
         type: Sequelize.STRING(30)
       },
-      address: {
+      species: {
         allowNull:false,
-        type: Sequelize.STRING(60)
+        type: Sequelize.STRING(20)
       },
-      city: {
-        type: Sequelize.STRING(30),
+      breed: {
+        type: Sequelize.STRING(20),
         allowNull: false,
       },
-      state: {
-        type: Sequelize.STRING(2),
+      age: {
+        type: Sequelize.STRING(10),
         allowNull: false,
       },
-      zip: {
-        type: Sequelize.STRING(5),
+      gender: {
+        type: Sequelize.STRING(6),
         allowNull: false
       },
-      lat: {
+      size: {
+        type: Sequelize.STRING(10),
+      },
+      fee: {
         type: Sequelize.INTEGER,
       },
-      lon: {
-        type: Sequelize.INTEGER,
-      },
-      phone: {
+      status: {
         type: Sequelize.STRING(11),
         allowNull: false
       },
-      email: {
-        type: Sequelize.STRING(60),
-        allowNull: false,
-      },
-      website: {
-        type: Sequelize.STRING(60),
-        allowNull: false,
-      }, 
       description: {
         allowNull: false,
         type: Sequelize.TEXT(500),    
@@ -63,6 +55,14 @@ module.exports = {
         allowNull: false,
         references: {
           model: 'Users',
+          key: 'id'
+        }
+      },
+       shelterId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Shelters',
           key: 'id'
         }
       },
@@ -79,7 +79,7 @@ module.exports = {
     }, options);
   },
   down: async (queryInterface:any, Sequelize:any) => {
-    options.tableName = "Shelters";
+    options.tableName = "Adopts";
     return queryInterface.dropTable(options);
   }
 };

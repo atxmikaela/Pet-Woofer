@@ -24,7 +24,8 @@ module.exports = {
     phone: "17138556291",
     email: "info@kerrvillepetsalive.com",
     website: "https://kerrvillepetsalive.com/",
-    description: "The place that keeps pets alive"
+    description: "The place that keeps pets alive",
+    userId: 1
   },
   {
     name: "Pet Seminary",
@@ -37,7 +38,8 @@ module.exports = {
     phone: "18308951112",
     email: "pets@petseminary.com",
     website: "https://petseminary.com",
-    description: "A spiritual shelter for cats and dogs"
+    description: "A spiritual shelter for cats and dogs",
+    userId: 2
   },
   {
     name: "Kerr County Animal Services",
@@ -50,7 +52,8 @@ module.exports = {
     phone: "18302576963",
     email: "animalcontrol@co.kerr.tx.us ",
     website: "https://kerrcountytx.gov",
-    description: "Kerr County Animal Services enforces ordinances, such as restraint laws, laws concerning rabies vaccinations and city/county registrations, rabies control, cruelty investigations, bite investigations and animal quarantines. We also educate the public about rabies control and local laws."
+    description: "Kerr County Animal Services enforces ordinances, such as restraint laws, laws concerning rabies vaccinations and city/county registrations, rabies control, cruelty investigations, bite investigations and animal quarantines. We also educate the public about rabies control and local laws.",
+    userId: 3
   },
 ], {});
   },
