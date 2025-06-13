@@ -48,6 +48,7 @@ module.exports = (sequelize: any, DataTypes: any) => {
         }
         // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 
+            public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 
     }
     Adopt.init(
@@ -112,7 +113,7 @@ module.exports = (sequelize: any, DataTypes: any) => {
         },
         {
             sequelize,
-            modelName: "Shelter",
+            modelName: "Adopt",
             defaultScope: {
                 attributes: {
                     exclude: []

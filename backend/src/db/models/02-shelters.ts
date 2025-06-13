@@ -48,6 +48,7 @@ module.exports = (sequelize: any, DataTypes: any) => {
         }
         // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 
+            static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 
     }
     Shelter.init(
