@@ -1,4 +1,4 @@
-import { ValidationError,BaseError} from "sequelize";
+import { ValidationError, BaseError} from "sequelize";
 
 
 export as namespace customError;
@@ -23,4 +23,8 @@ export interface errors {
     email?: string,
     username?: string,
     password?: string,
+}
+
+export interface RoleErrors {
+    [key: string]: string;
 }

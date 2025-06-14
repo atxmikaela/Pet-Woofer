@@ -9,12 +9,19 @@ type UserAttributes = {
     username: string,
     email: string,
     hashedPassword: string,
+    role: string,
+    shelterId: number,
 };
+
 
 type UserCreationAttributes = Optional<
     UserAttributes, 'id'>;
 
+type RoleAttributes = 'Public' | 'KPA Volunteer' | 'Shelter Volunteer' | 'KPA Staff' | 'Shelter Staff' | 'Admin';
+
 module.exports = (sequelize: any, DataTypes: any) => {
+
+    
 
     class User extends Model<UserAttributes, UserCreationAttributes> {
         declare id: CreationOptional<number>;
@@ -23,17 +30,20 @@ module.exports = (sequelize: any, DataTypes: any) => {
         declare email: string;
         declare username: string;
         declare hashedPassword: string;
+        declare shelterId: number;
+        declare role: RoleAttributes;
 
 
-        async getSafeUser() {
-            const safeUser = {
+    async getSafeUser() {
+            return {
                 id: this.id,
                 email: this.email,
                 username: this.username,
                 firstName: this.firstName,
                 lastName: this.lastName,
+                role: this.role,
             };
-            return safeUser
+            
         }
 
         static associate(models: any) {
@@ -106,13 +116,21 @@ module.exports = (sequelize: any, DataTypes: any) => {
                     len: [60, 60]
                 }
             },
+            role: {
+                type: DataTypes.ENUM('Public', 'KPA Volunteer', 'Shelter Volunteer', 'Shelter Staff', 'KPA Staff', 'Admin'),
+                allowNull: false,
+                defaultValue: 'Public'                
+            },
+            shelterId: {
+                type: DataTypes.INTEGER
+            }
         },
         {
             sequelize,
             modelName: "User",
             defaultScope: {
                 attributes: {
-                    exclude: ["hashedPassword", "email", "createdAt", "updatedAt"]
+                    exclude: ["hashedPassword", "createdAt", "updatedAt"]
                 }
             },
         }

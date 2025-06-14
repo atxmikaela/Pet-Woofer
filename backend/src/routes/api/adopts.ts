@@ -12,7 +12,7 @@ const {Adopt, Shelter, User} = db;
 const router = require('express').Router();
 
 
-// Get all adopts
+// Get all adoptable pets
 
 router.get('/', validateQueryParams, async(req:Request, res: Response, next: NextFunction) => {
     try {
@@ -34,7 +34,7 @@ router.get('/', validateQueryParams, async(req:Request, res: Response, next: Nex
     }
 })
 
-// Get all shelters owned by current user: 
+// Get all adoptable pets owned by current user: 
 
 router.get('/my-adopts/:userId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
     try {
@@ -176,15 +176,9 @@ router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => 
         result.description = newAdoptJson.description;
         result.userId = newAdoptJson.userId;
         result.shelterId = newAdoptJson.shelterId;
+        result.createdAt = dateConverter(newAdoptJson.createdAt);
+        result.updatedAt = dateConverter(newAdoptJson.updatedAt);
 
-        let createdAt = new Date(newAdoptJson.createdAt);
-        let updatedAt = new Date(newAdoptJson.updatedAt);
-
-        let resCreatedDate = `${createdAt.getFullYear()} - ${createdAt.getMonth()} - ${createdAt.getDate()}`;
-        let resUpdatedDate = `${updatedAt.getFullYear()} - ${updatedAt.getMonth()} - ${updatedAt.getDate()}`;
-
-        result.createdAt = resCreatedDate;
-        result.updatedAt = resUpdatedDate;
 
         res.status(201);
         return res.json(result);
@@ -273,7 +267,7 @@ router.put('/:adoptId', async(req:CustomeRequest, res: Response, next: NextFunct
     }
 });
 
-//delete a shelter
+//delete an adoptable pet
 
     router.delete('/:adoptId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
 

@@ -14,24 +14,53 @@ module.exports = {
     options.tableName = 'Users';
     return queryInterface.bulkInsert(options, [
   {
-    firstName: "SpongeBob",
-    lastName: "Squarepants",
-    email: "spongebob@aa.io",
-    username: "Spongebob",
+    firstName: "Public",
+    lastName: "User",
+    email: "public@wolfer.com",
+    username: "public",
+    role: "Public",
     hashedPassword: "$2a$10$RWA3t0FVaTYW1AOKNz5La.3jZDoe0RRqfZ3GFIIrmuNxnjHS0bxu6"
   },
   {
-    firstName: "Patrick",
-    lastName: "Star",
-    email: "Patrick@Star.com",
-    username: "PatrickStar",
-    hashedPassword: "$2a$10$3LIv4Lvl2vpNWiQceaGh0uabDJomSvSetIJanpEzualAkKd9Nbbmm"
+    firstName: "KPA",
+    lastName: "Volunteer",
+    email: "kpavolunteer@wolfer.com",
+    username: "kpavolunteer",
+    role: "KPA Volunteer",
+    hashedPassword: "$2a$10$RWA3t0FVaTYW1AOKNz5La.3jZDoe0RRqfZ3GFIIrmuNxnjHS0bxu6"
   },
   {
-    firstName: "Joe",
-    lastName: "Smith",
-    email: "demo@aa.io",
-    username: "demo",
+    firstName: "Shelter",
+    lastName: "Volunteer",
+    email: "sheltervolunteer@wolfer.com",
+    username: "sheltervolunteer",
+    role: "Shelter Volunteer",
+    shelterId: "1",
+    hashedPassword: "$2a$10$RWA3t0FVaTYW1AOKNz5La.3jZDoe0RRqfZ3GFIIrmuNxnjHS0bxu6"
+  },
+    {
+    firstName: "KPA",
+    lastName: "Staff",
+    email: "kpastaff@wolfer.com",
+    username: "kpastaff",
+    role: "KPA Staff",
+    hashedPassword: "$2a$10$RWA3t0FVaTYW1AOKNz5La.3jZDoe0RRqfZ3GFIIrmuNxnjHS0bxu6"
+  },
+    {
+    firstName: "Shelter",
+    lastName: "Staff",
+    email: "shelterstaff@wolfer.com",
+    username: "shelterstaff",
+    role: "Shelter Staff",
+    shelterId: "2",
+    hashedPassword: "$2a$10$RWA3t0FVaTYW1AOKNz5La.3jZDoe0RRqfZ3GFIIrmuNxnjHS0bxu6"
+  },
+    {
+    firstName: "Wolfer",
+    lastName: "Admin",
+    email: "admin@wolfer.com",
+    username: "admin",
+    role: "Admin",
     hashedPassword: "$2a$10$RWA3t0FVaTYW1AOKNz5La.3jZDoe0RRqfZ3GFIIrmuNxnjHS0bxu6"
   },
 ], {});

@@ -6,6 +6,8 @@ export interface LoginUser {
     lastName: string,
     email: string,
     username: string,
+    role: string,
+    shelterId: number,
     isHost: boolean
 }
 
@@ -49,8 +51,4 @@ export interface GoodAdopt {
     updatedAt: string,
 }
 
-export interface WhereValues{
-    lat?: any,
-    lng?: any,
-    price?: any
-}
+

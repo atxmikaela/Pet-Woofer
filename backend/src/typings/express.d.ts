@@ -6,7 +6,9 @@ export interface SafeUser {
     email: string,
     username: string,
     firstName: string,
-    lastName: string
+    lastName: string,
+    shelterId: number,
+    role: string
 }
 
 export interface CustomeRequest extends Request {

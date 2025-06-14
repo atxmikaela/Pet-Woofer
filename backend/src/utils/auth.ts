@@ -5,6 +5,7 @@ import { AuthError } from "../errors/customErrors";
 const jwt = require('jsonwebtoken')
 const { jwtConfig } = require('../config');
 import db from '../db/models'
+import { string } from "yargs";
 const {User} = db;
 const { secret, expiresIn } = jwtConfig;
 
@@ -14,6 +15,7 @@ interface ISafeUser {
   firstName: string;
   lastName: string;
   email: string;
+  role: string;
   username: string;
 }
 
@@ -23,6 +25,7 @@ export const setMobileToken = (res:Response, user:any) => {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    role: user.string,
     username: user.username
   };
 
@@ -48,6 +51,7 @@ export const setTokenCookie = (res:Response, user:any) => {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    role: user.role,
     username: user.username
   };
 

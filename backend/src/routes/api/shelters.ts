@@ -159,15 +159,8 @@ router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => 
         result.website = newShelterJson.website;
         result.description = newShelterJson.website;
         result.userId = newShelterJson.userId;
-
-        let createdAt = new Date(newShelterJson.createdAt);
-        let updatedAt = new Date(newShelterJson.updatedAt);
-
-        let resCreatedDate = `${createdAt.getFullYear()} - ${createdAt.getMonth()} - ${createdAt.getDate()}`;
-        let resUpdatedDate = `${updatedAt.getFullYear()} - ${updatedAt.getMonth()} - ${updatedAt.getDate()}`;
-
-        result.createdAt = resCreatedDate;
-        result.updatedAt = resUpdatedDate;
+        result.createdAt = dateConverter(newShelterJson.createdAt);
+        result.updatedAt = dateConverter(newShelterJson.updatedAt);
 
         res.status(201);
         return res.json(result);
