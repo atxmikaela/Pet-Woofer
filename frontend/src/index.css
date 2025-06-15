@@ -1,1 +1,15 @@
-/* TODO: Add sitewide styles */
+/* Site-wide styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    
+
+}
+
+* {
+    background-image: linear-gradient(to top, #fdcbf1 0%, #fdcbf1 1%, #e6dee9 100%);
+    background-attachment: fixed;
+}
+
+

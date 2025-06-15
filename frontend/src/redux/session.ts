@@ -119,9 +119,7 @@ export const thunkLogout = (): any => async (dispatch: any) => {
 const initialState: SessionInitialState = { user: null };
 
 function sessionReducer(state = initialState, action: IActionCreator): SessionInitialState {
-  let newState = {
-    ...state
-  };
+
 
   switch (action.type) {
     case SET_USER:
