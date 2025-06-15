@@ -48,32 +48,7 @@ const setUser = (user: IUser) => ({
 ```
 
 
-- We will use `useAppSelector` to grab from `state`, because this will tell us the types
 
-Example:
-
-```ts
-// imports ^
-
-function SignupFormPage() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  // Notice thhe useAppSelector
-  const sessionUser = useAppSelector((state) => state.session.user);
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<ISignUpErrors>({
-    server: "",
-    email: "",
-    username: "",
-    password: "",
-    confirmPassword: ""
-  });
-
-}
-```
 
 - Reducer
 
@@ -184,6 +159,9 @@ interface ISpotForm {
     images: string[];
 
 }
+
+
+
 
 
 const SplashPage = () => {

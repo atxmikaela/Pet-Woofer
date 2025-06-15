@@ -24,11 +24,34 @@ router.get('/', validateQueryParams, async(req:Request, res: Response, next: Nex
             res.createdAt = dateConverter(res.createdAt);
             res.updatedAt = dateConverter(res.updatedAt);
             return res;
-    })
+    });
+
+    const byId: any = {};
+    const allAdopts: any[] = [];
+
+    adoptTransform.forEach((adopt: any) => {
+        byId[adopt.id] = adopt;
+        allAdopts.push(adopt);
+    });
+
+
     res.status(200);
-    res.json({
-        adopts: adoptTransform,
-    })
+    res.json({ byId, allAdopts });
+    } catch (e) {
+        return next(e);
+    }
+})
+
+// Get one adoptable pet by adoptable pet ID:
+
+router.get('/:id', validateQueryParams, async(req:Request, res: Response, next: NextFunction) => {
+    try {
+        const adoptId = req.params.id;
+        const adopt = await Adopt.findByPk(adoptId)
+
+    if ( !adopt ) throw new NoResourceError( "Adoptable pet couldn't be found", 404);
+    res.status(200);
+    res.json(adopt);
     } catch (e) {
         return next(e);
     }
