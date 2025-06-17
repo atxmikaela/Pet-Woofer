@@ -7,11 +7,11 @@ import {
 import thunk from "redux-thunk";
 import sessionReducer from "./session";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import adoptsReducer from "./adopts";
+import petsReducer from "./pets";
 
 const rootReducer = combineReducers({
   session: sessionReducer,
-  adopts: adoptsReducer,
+  pets: petsReducer,
 });
 
 
@@ -30,10 +30,7 @@ const configureStore = (preloadedState:any) => {
   return createStore(rootReducer, preloadedState, enhancer);
 };
 
-const store = configureStore({
-  rootReducer,
-  devTools: import.meta.env.VITE_NODE_ENV !== 'production'
-})
+const store = configureStore({})
 
 export const useAppDispatch: () => typeof store.dispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<ReturnType<typeof store.getState>> = useSelector;

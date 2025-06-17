@@ -34,7 +34,7 @@ export interface GoodShelter {
     userId: number,
 }
 
-export interface GoodAdopt {
+export interface GoodPet {
     id: number,
     name: string,
     species: string,
@@ -50,5 +50,7 @@ export interface GoodAdopt {
     createdAt: string,
     updatedAt: string,
 }
+
+
 
 

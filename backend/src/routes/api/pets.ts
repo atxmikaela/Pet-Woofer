@@ -4,65 +4,72 @@ import { validateQueryParams } from "../../utils/validation";
 import db from '../../db/models';
 import { Op } from 'sequelize';
 import { dateConverter } from "../../utils/date-conversion";
-import { GoodAdopt } from "../../typings/data";
+import { GoodPet } from "../../typings/data";
 import { ForbiddenError, NoResourceError, UnauthorizedError } from "../../errors/customErrors";
 
 
-const {Adopt, Shelter, User} = db;
+const {Pet, Shelter, User} = db;
 const router = require('express').Router();
 
 
-// Get all adoptable pets
+// Get all petable pets
 
 router.get('/', validateQueryParams, async(req:Request, res: Response, next: NextFunction) => {
     try {
-        const adopts = await Adopt.findAll();
+        const pets = await Pet.findAll();
 
-        const adoptTransform = adopts.map((adopt:any) => {
-            const adoptJson = adopt.toJSON()
-            const { ...res } = adoptJson;
-            res.createdAt = dateConverter(res.createdAt);
-            res.updatedAt = dateConverter(res.updatedAt);
-            return res;
-    });
+        const petTransform = (pet:any) => {
+            const petJson = pet.toJSON()
+            // const { ...res } = petJson;
+            return {
+                ...petJson,
+            createdAt: dateConverter(petJson.createdAt),
+            updatedAt: dateConverter(petJson.updatedAt)
+            // return res;
+            };
+    };
 
-    const byId: any = {};
-    const allAdopts: any[] = [];
+    const byId = pets.reduce((acc: any, pet: any) => {
+        const transformed = petTransform(pet);
+        acc[transformed.id] = transformed;
+        return acc;
+    }, {});
+    // const allPets: any[] = [];
 
-    adoptTransform.forEach((adopt: any) => {
-        byId[adopt.id] = adopt;
-        allAdopts.push(adopt);
-    });
+    // petTransform.forEach((pet: any) => {
+    //     byId[pet.id] = pet;
+    //     allPets.push(pet);
+    // });
 
 
-    res.status(200);
-    res.json({ byId, allAdopts });
+    res.status(200).json({byId});
+   
     } catch (e) {
         return next(e);
     }
 })
 
-// Get one adoptable pet by adoptable pet ID:
+// Get one petable pet by petable pet ID:
 
 router.get('/:id', validateQueryParams, async(req:Request, res: Response, next: NextFunction) => {
     try {
-        const adoptId = req.params.id;
-        const adopt = await Adopt.findByPk(adoptId)
+        const petId = req.params.id;
+        const pet = await Pet.findByPk(petId)
 
-    if ( !adopt ) throw new NoResourceError( "Adoptable pet couldn't be found", 404);
+    if (!pet) throw new NoResourceError("Petable pet couldn't be found", 404);
     res.status(200);
-    res.json(adopt);
+    res.json(pet);
     } catch (e) {
         return next(e);
     }
 })
 
-// Get all adoptable pets owned by current user: 
+// Get all petable pets owned by current user: 
 
-router.get('/my-adopts/:userId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
+router.get('/my-pets/:userId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
     try {
         const userId = req.params.userId;
-        const adopts = await Adopt.findAll({
+        const pets = await Pet.findAll({
             where: {
                 userId: userId
             },
@@ -71,9 +78,9 @@ router.get('/my-adopts/:userId', async(req:CustomeRequest, res: Response, next: 
             ]
         });
 
-        const adoptTransform = adopts.map((adopt:any) => {
-            const adoptJson = adopt.toJSON();
-            const {Owner, ...res} = adoptJson;
+        const petTransform = pets.map((pet:any) => {
+            const petJson = pet.toJSON();
+            const {Owner, ...res} = petJson;
             
             res.ownerId = Owner.id;
             res.createdAt = dateConverter(res.createdAt);
@@ -82,17 +89,17 @@ router.get('/my-adopts/:userId', async(req:CustomeRequest, res: Response, next: 
         })
 
         res.status(200);
-        res.json({Adopts: adoptTransform});
+        res.json({Pets: petTransform});
     } catch (e) {
         res.json({message: e})
     }
 })
 
-// get an adoptable pet by shelter
+// get an petable pet by shelter
 router.get('/by-shelter/:shelterId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
     try {
         const shelterId = req.params.shelterId;
-        const adopts = await Adopt.findAll({
+        const pets = await Pet.findAll({
             where: {
                 shelterId: shelterId
             },
@@ -101,9 +108,9 @@ router.get('/by-shelter/:shelterId', async(req:CustomeRequest, res: Response, ne
             ]
         });
 
-        const adoptTransform = adopts.map((adopt:any) => {
-            const adoptJson = adopt.toJSON();
-            const {Rescue, ...res} = adoptJson;
+        const petTransform = pets.map((pet:any) => {
+            const petJson = pet.toJSON();
+            const {Rescue, ...res} = petJson;
             
             res.rescueId = Rescue.id;
             res.createdAt = dateConverter(res.createdAt);
@@ -112,7 +119,7 @@ router.get('/by-shelter/:shelterId', async(req:CustomeRequest, res: Response, ne
         })
 
         res.status(200);
-        res.json({Adopts: adoptTransform});
+        res.json({Pets: petTransform});
     } catch (e) {
         res.json({message: e})
     }
@@ -130,7 +137,7 @@ router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => 
         if(!req.body.age) throw new Error("You must include the approximate age of the pet.");
         if(!req.body.gender) throw new Error("You must include the gender of the pet.");
         if(!req.body.size) throw new Error("You must include the size of the pet.");
-        if(!req.body.fee) throw new Error("You must include the fee to adopt the pet.");
+        if(!req.body.fee) throw new Error("You must include the fee to pet the pet.");
         if(!req.body.status) throw new Error("You must include the status of the pet.");
         if(!req.body.description) throw new Error("You must include a description of the pet");
 
@@ -150,8 +157,8 @@ router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => 
 
 
 
-        // creates new adoptable pet
-        const newAdopt = await Adopt.create({
+        // creates new petable pet
+        const newPet = await Pet.create({
             name,
             species,
             breed,
@@ -165,9 +172,9 @@ router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => 
             shelterId,
     });
     
-        if(!newAdopt) throw Error("Unable to create a shelter. please try again");
+        if(!newPet) throw Error("Unable to create a shelter. please try again");
 
-        let result: GoodAdopt = {
+        let result: GoodPet = {
 
             id: 0,
             name: "",
@@ -186,21 +193,21 @@ router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => 
 
         };
 
-        let newAdoptJson = newAdopt.toJSON();
-        result.id = newAdoptJson.id;
-        result.name = newAdoptJson.name;
-        result.species = newAdoptJson.species;
-        result.breed = newAdoptJson.breed;
-        result.age = newAdoptJson.age;
-        result.gender = newAdoptJson.gender;
-        result.size = newAdoptJson.size;
-        result.fee = Number(newAdoptJson.fee);
-        result.status = newAdoptJson.status;
-        result.description = newAdoptJson.description;
-        result.userId = newAdoptJson.userId;
-        result.shelterId = newAdoptJson.shelterId;
-        result.createdAt = dateConverter(newAdoptJson.createdAt);
-        result.updatedAt = dateConverter(newAdoptJson.updatedAt);
+        let newPetJson = newPet.toJSON();
+        result.id = newPetJson.id;
+        result.name = newPetJson.name;
+        result.species = newPetJson.species;
+        result.breed = newPetJson.breed;
+        result.age = newPetJson.age;
+        result.gender = newPetJson.gender;
+        result.size = newPetJson.size;
+        result.fee = Number(newPetJson.fee);
+        result.status = newPetJson.status;
+        result.description = newPetJson.description;
+        result.userId = newPetJson.userId;
+        result.shelterId = newPetJson.shelterId;
+        result.createdAt = dateConverter(newPetJson.createdAt);
+        result.updatedAt = dateConverter(newPetJson.updatedAt);
 
 
         res.status(201);
@@ -210,76 +217,76 @@ router.post('/', async(req:CustomeRequest, res:Response, next: NextFunction) => 
     }
 });
 
-//update an adoptable pet
+//update an petable pet
 
-router.put('/:adoptId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
+router.put('/:petId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
     try {
-        if(req.params.adoptId){
-            let adoptId = req.params.adoptId;
+        if(req.params.petId){
+            let petId = req.params.petId;
 
-            if(!req.body) throw new NoResourceError('You must pass in a body to update an adoptable pet', 400);
+            if(!req.body) throw new NoResourceError('You must pass in a body to update an petable pet', 400);
 
             let {newName, newSpecies, newBreed, newAge, newGender, newSize, newFee, newStatus, newDescription, newUserId, newShelterId} = req.body;
         
 
-        const oldAdopt = await Adopt.findByPk(adoptId);
-        if(!oldAdopt) throw new NoResourceError("Adoptable pet couldn't be found, 404");
-        let {...response} = oldAdopt.toJSON();
+        const oldPet = await Pet.findByPk(petId);
+        if(!oldPet) throw new NoResourceError("Adoptable pet couldn't be found, 404");
+        let {...response} = oldPet.toJSON();
 
         //User.id is questionable - should be userId?
-        if(response.userId !== oldAdopt.userId){ 
+        if(response.userId !== oldPet.userId){ 
             throw new UnauthorizedError("You are not authorized to edit this shelter", 401);
         } else {
             if(newName && response.name !== newName){
-                oldAdopt.name = newName;
+                oldPet.name = newName;
                 response.name = newName;
             }
             if(newSpecies&& response.species !== newSpecies){
-                oldAdopt.species = newSpecies
+                oldPet.species = newSpecies
                 response.species = newSpecies;
             }
             if(newBreed && response.breed !== newBreed){
-                oldAdopt.breed = newBreed;
+                oldPet.breed = newBreed;
                 response.breed = newBreed;
             }
             if(newAge && response.age !== newAge){
-                oldAdopt.age = newAge;
+                oldPet.age = newAge;
                 response.age = newAge;
             }
             if(newGender && response.gender !== newGender){
-                oldAdopt.gender = newGender;
+                oldPet.gender = newGender;
                 response.gender = newGender;
             }
             if(newSize && response.size !== newSize){
-                oldAdopt.size = newSize;
+                oldPet.size = newSize;
                 response.size = newSize;
             }
             if(newFee && response.fee !== newFee){
-                oldAdopt.fee = newFee;
+                oldPet.fee = newFee;
                 response.fee = newFee;
             }
             if(newStatus && response.status !== newStatus){
-                oldAdopt.status = newStatus;
+                oldPet.status = newStatus;
                 response.status = newStatus;
             }
             if(newDescription && response.description !== newDescription){
-                oldAdopt.description = newDescription;
+                oldPet.description = newDescription;
                 response.description = newDescription;
             }
             if(newUserId && response.userId !== newUserId){
-                oldAdopt.userId = newUserId;
+                oldPet.userId = newUserId;
                 response.userId = newUserId;
             }
             if(newShelterId && response.shelterId !== newShelterId){
-                oldAdopt.shelterId = newShelterId;
+                oldPet.shelterId = newShelterId;
                 response.shelterId = newShelterId;
             }
 
 
             //newDescription, newUserId, newShelterId
-            await oldAdopt.save();
+            await oldPet.save();
             res.status(200);
-            res.json(oldAdopt);
+            res.json(oldPet);
         }
 
         } else {
@@ -290,23 +297,23 @@ router.put('/:adoptId', async(req:CustomeRequest, res: Response, next: NextFunct
     }
 });
 
-//delete an adoptable pet
+//delete an petable pet
 
-    router.delete('/:adoptId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
+    router.delete('/:petId', async(req:CustomeRequest, res: Response, next: NextFunction) => {
 
         try {
             if(!req.user) throw new UnauthorizedError('You must be signed in to perform this action');
             let userId = req.user.id;
-            let adoptId: string | number = req.params.adoptId;
-            if(!adoptId) throw new Error('Please pass in a valid shelter id');
+            let petId: string | number = req.params.petId;
+            if(!petId) throw new Error('Please pass in a valid shelter id');
 
-            adoptId = Number(adoptId);
-            let adopt = await Adopt.findByPk(adoptId);
-            if(!adopt) throw new NoResourceError("Adoptable pet couldn't be found", 404);
-            let adoptJSON = await adopt.toJSON();
-            if(adoptJSON.userId !== userId) throw new ForbiddenError('Forbidden: This is not your adoptable pet!');
-            adopt.destroy();
-            return res.json(adopt);
+            petId = Number(petId);
+            let pet = await Pet.findByPk(petId);
+            if(!pet) throw new NoResourceError("Petable pet couldn't be found", 404);
+            let petJSON = await pet.toJSON();
+            if(petJSON.userId !== userId) throw new ForbiddenError('Forbidden: This is not your petable pet!');
+            pet.destroy();
+            return res.json(pet);
         } catch (e) {
             return next (e);
         }

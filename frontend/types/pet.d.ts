@@ -1,6 +1,5 @@
-
-
-export interface IAdopt {
+export interface IPet {
+    id: number,
     name: string,
     species: string,
     breed: string,

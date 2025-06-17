@@ -1,6 +1,9 @@
 
 
-export interface IAdopt {
+
+export interface Pet
+{
+    id: number,
     name: string,
     species: string,
     breed: string,
@@ -14,15 +17,20 @@ export interface IAdopt {
     shelterId: number,
 }
 
-export interface IAdoptState {
+export interface IPetState
+{
     byId: {
-        [id: number]: Adopt;
+        [id: number]: Pet;
     },
-    allAdopts: Adopt[];
 }
 
-export interface IAdoptAction {
-    type: GET_ALL_ADOPTS,
-    payload: adopts
-} 
+export interface Pets
+    {
+        byId: IPetState;
+        pets: Pet;
+    }
 
+export interface IPetAction {
+    type: string;
+    payload: Pets;
+}

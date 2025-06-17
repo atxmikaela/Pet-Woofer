@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === 'production') {
 
 module.exports = {
   up: async (queryInterface:any, Sequelize:any) => {
-    options.tableName = 'Adopts';
+    options.tableName = 'Pets';
     return queryInterface.bulkInsert(options, [
   {
     name: "Rambo",
@@ -20,8 +20,9 @@ module.exports = {
     age: "6",
     gender: "male",
     size: "large",
+    color: 'black and brown',
     fee: 65,
-    status: "Available",
+    status: "protective custody",
     description: "For a limited time, when you adopt Rambo, you get the entire box set of Rambo movies on VHS and your own cutout of Sylvestor Stallone",
     userId: 1,
     shelterId: 3
@@ -32,9 +33,10 @@ module.exports = {
     breed: "Husky",
     age: "5",
     gender: "male",
+    color: 'brown',
     size: "large",
     fee: 65,
-    status: "Available",
+    status: "available",
     description: "Oliver is the sassiest of sassy. It's not quite a bark, and it's definitely not a bite, but Oliver talks in kind of lazy 'no.'",
     userId: 1,
     shelterId: 1
@@ -45,9 +47,10 @@ module.exports = {
     breed: "Tabby",
     age: "2",
     gender: "female",
+    color: 'orange',
     size: "extremely large",
     fee: 65,
-    status: "Available",
+    status: "found",
     description: "Goliath was found at a nuclear waste facility. She does what she wants, when she wants, and never answers by her name, unless you have food.",
     userId: 1,
     shelterId: 2
@@ -56,7 +59,7 @@ module.exports = {
   },
 
   down: async (queryInterface:any, Sequelize:any) => {
-    options.tableName = 'Adopts';
+    options.tableName = 'Pets';
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
       username: { [Op.in]: [''] }

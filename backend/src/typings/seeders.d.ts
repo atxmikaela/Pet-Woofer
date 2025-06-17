@@ -30,7 +30,7 @@ export interface Shelter {
     userId: number,
 }
 
-export interface Adopt {
+export interface Pet {
     firstName: string;
     lastName: string;
     email: string;
