@@ -47,10 +47,13 @@ export interface GoodPet {
     description: string,
     shelterId: number,
     userId: number,
+    lastSeenLocation: string,
+    lastSeenDate: string,
+    color: string,
+    expireDate: string,
     createdAt: string,
     updatedAt: string,
 }
-
 
 
 
