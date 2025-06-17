@@ -20,7 +20,6 @@ module.exports = {
       },
       petId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         references: {
             model: 'Pets',
             schema: 'schema'

@@ -145,6 +145,9 @@ module.exports = (sequelize: any, DataTypes: any) => {
                 type: DataTypes.DATE,
                 allowNull: true
             },
+            expireDate: {
+                type: DataTypes.DATE
+            },
             description: {
                 type: DataTypes.TEXT,
                 allowNull: false

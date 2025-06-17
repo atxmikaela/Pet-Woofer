@@ -18,11 +18,11 @@ module.exports = {
       },
       name: {
         allowNull:false,
-        type: Sequelize.STRING(30)
+        type: Sequelize.STRING(100)
       },
       address: {
         allowNull:false,
-        type: Sequelize.STRING(60)
+        type: Sequelize.STRING(100)
       },
       city: {
         type: Sequelize.STRING(30),
@@ -43,15 +43,15 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       phone: {
-        type: Sequelize.STRING(11),
+        type: Sequelize.STRING(14),
         allowNull: false
       },
       email: {
-        type: Sequelize.STRING(60),
+        type: Sequelize.STRING(100),
         allowNull: false,
       },
       website: {
-        type: Sequelize.STRING(60),
+        type: Sequelize.STRING(100),
         allowNull: false,
       }, 
       description: {

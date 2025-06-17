@@ -9,16 +9,15 @@ import { ForbiddenError, NoResourceError, UnauthorizedError } from "../../errors
 
 
 const { Pet, Shelter, User } = db;
-const router = require( 'express' ).Router();
+const router = require('express').Router();
 
 
 // Get all petable pets
 
-router.get( '/', validateQueryParams, async ( req: Request, res: Response, next: NextFunction ) =>
-{
+router.get('/', validateQueryParams, async (req: Request, res: Response, next: NextFunction) => {
     try
     {
-        const pets = await Pet.findAll( {
+        const pets = await Pet.findAll({
             include: [
                 {
                     model: Shelter,
@@ -29,24 +28,25 @@ router.get( '/', validateQueryParams, async ( req: Request, res: Response, next:
                     as: 'images'
                 }
             ]
-        } );
+        });
 
-        const petTransform = ( pet: any ) =>
+        const petTransform = (pet: any) =>
         {
             const petJson = pet.toJSON();
             // const { ...res } = petJson;
             return {
                 ...petJson,
-                createdAt: dateConverter( petJson.createdAt ),
-                updatedAt: dateConverter( petJson.updatedAt )
+                expireDate: petJson.expireDate,
+                createdAt: dateConverter(petJson.createdAt),
+                updatedAt: dateConverter(petJson.updatedAt)
                 // return res;
             };
         };
 
-        const byId = pets.reduce( ( acc: any, pet: any ) =>
+        const byId = pets.reduce((acc: any, pet: any) =>
         {
-            const transformed = petTransform( pet );
-            acc[ transformed.id ] = transformed;
+            const transformed = petTransform(pet);
+            acc[transformed.id] = transformed;
             return acc;
         }, {} );
         // const allPets: any[] = [];
@@ -57,22 +57,19 @@ router.get( '/', validateQueryParams, async ( req: Request, res: Response, next:
         // });
 
 
-        res.status( 200 ).json( { byId } );
+        res.status(200).json({ byId });
 
-    } catch ( e )
-    {
-        return next( e );
+    } catch (e) {
+        return next(e);
     }
-} );
+});
 
 // Get one petable pet by petable pet ID:
 
-router.get( '/:id', validateQueryParams, async ( req: Request, res: Response, next: NextFunction ) =>
-{
-    try
-    {
+router.get('/:id', validateQueryParams, async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
         const petId = req.params.id;
-        const pet = await Pet.findByPk( petId, {
+        const pet = await Pet.findByPk(petId, {
             include: [
                 {
                     model: Shelter,
@@ -85,52 +82,48 @@ router.get( '/:id', validateQueryParams, async ( req: Request, res: Response, ne
             ]
         } );
 
-        if ( !pet ) throw new NoResourceError( "Petable pet couldn't be found", 404 );
-        res.status( 200 );
-        res.json( pet );
-    } catch ( e )
+        if (!pet) throw new NoResourceError("Petable pet couldn't be found", 404);
+        res.status(200);
+        res.json(pet);
+    } catch (e)
     {
-        return next( e );
+        return next(e);
     }
-} );
+});
 
 // Get all petable pets owned by current user: 
 
-router.get( '/my-pets/:userId', async ( req: CustomeRequest, res: Response, next: NextFunction ) =>
-{
-    try
-    {
+router.get( '/my-pets/:userId', async ( req: CustomeRequest, res: Response, next: NextFunction ) => {
+    try {
         const userId = req.params.userId;
-        const pets = await Pet.findAll( {
+        const pets = await Pet.findAll({
             where: {
                 userId: userId
             },
             include: [
-                { model: User, as: "Owner" }
+                {model: User, as: "Owner"}
             ]
-        } );
+        });
 
-        const petTransform = pets.map( ( pet: any ) =>
-        {
+        const petTransform = pets.map((pet: any) => {
             const petJson = pet.toJSON();
             const { Owner, ...res } = petJson;
 
             res.ownerId = Owner.id;
-            res.createdAt = dateConverter( res.createdAt );
-            res.updatedAt = dateConverter( res.updatedAt );
+            res.createdAt = dateConverter(res.createdAt);
+            res.updatedAt = dateConverter(res.updatedAt);
             return res;
-        } );
+        });
 
-        res.status( 200 );
-        res.json( { Pets: petTransform } );
-    } catch ( e )
-    {
-        res.json( { message: e } );
+        res.status(200);
+        res.json({ Pets: petTransform });
+    } catch (e) {
+        res.json({message: e});
     }
-} );
+});
 
 // get an petable pet by shelter
-router.get( '/by-shelter/:shelterId', async ( req: CustomeRequest, res: Response, next: NextFunction ) =>
+router.get('/by-shelter/:shelterId', async (req: CustomeRequest, res: Response, next: NextFunction) =>
 {
     try
     {
@@ -140,46 +133,45 @@ router.get( '/by-shelter/:shelterId', async ( req: CustomeRequest, res: Response
                 shelterId: shelterId
             },
             include: [
-                { model: Shelter, as: "Rescue" }
+                {model: Shelter, as: "Rescue"}
             ]
-        } );
+        });
 
-        const petTransform = pets.map( ( pet: any ) =>
+        const petTransform = pets.map( (pet: any) =>
         {
             const petJson = pet.toJSON();
             const { Rescue, ...res } = petJson;
 
             res.rescueId = Rescue.id;
-            res.createdAt = dateConverter( res.createdAt );
-            res.updatedAt = dateConverter( res.updatedAt );
+            res.createdAt = dateConverter(res.createdAt);
+            res.updatedAt = dateConverter(res.updatedAt);
             return res;
-        } );
+        });
 
-        res.status( 200 );
-        res.json( { Pets: petTransform } );
-    } catch ( e )
+        res.status(200);
+        res.json({ Pets: petTransform });
+    } catch (e)
     {
-        res.json( { message: e } );
+        res.json({message: e});
     }
-} );
+});
 
 
-router.post( '/', async ( req: CustomeRequest, res: Response, next: NextFunction ) =>
-{
+router.post('/', async (req: CustomeRequest, res: Response, next: NextFunction) => {
     try
     {
-        if ( !req.body ) throw new Error( "An error occured processing your request. Please try again" );
-        if ( !req.body.userId ) throw new Error( "You must be signed in to add a rescued pet." );
-        if ( !req.body.shelterId ) throw new Error( "You must include the shelter to add a rescued pet." );
-        if ( !req.body.name ) throw new Error( "You must include the name of the pet." );
-        if ( !req.body.species ) throw new Error( "You must include the species of the pet." );
-        if ( !req.body.breed ) throw new Error( "You must include the breed of the pet." );
-        if ( !req.body.age ) throw new Error( "You must include the approximate age of the pet." );
-        if ( !req.body.gender ) throw new Error( "You must include the gender of the pet." );
-        if ( !req.body.size ) throw new Error( "You must include the size of the pet." );
-        if ( !req.body.color ) throw new Error( "You must include the color of the pet." );
-        if ( !req.body.status ) throw new Error( "You must include the status of the pet." );
-        if ( !req.body.description ) throw new Error( "You must include a description of the pet" );
+        if (!req.body) throw new Error("An error occured processing your request. Please try again");
+        if (!req.body.userId) throw new Error("You must be signed in to add a rescued pet.");
+        if (!req.body.shelterId) throw new Error("You must include the shelter to add a rescued pet.");
+        if (!req.body.name) throw new Error("You must include the name of the pet.");
+        if (!req.body.species) throw new Error("You must include the species of the pet.");
+        if (!req.body.breed) throw new Error("You must include the breed of the pet.");
+        if (!req.body.age) throw new Error("You must include the approximate age of the pet.");
+        if (!req.body.gender) throw new Error("You must include the gender of the pet.");
+        if (!req.body.size) throw new Error("You must include the size of the pet.");
+        if (!req.body.color) throw new Error("You must include the color of the pet.");
+        if (!req.body.status) throw new Error("You must include the status of the pet.");
+        if (!req.body.description) throw new Error("You must include a description of the pet");
 
         const {
             name,
@@ -202,7 +194,7 @@ router.post( '/', async ( req: CustomeRequest, res: Response, next: NextFunction
 
 
         // creates new petable pet
-        const newPet = await Pet.create( {
+        const newPet = await Pet.create({
             name,
             species,
             breed,
@@ -218,9 +210,9 @@ router.post( '/', async ( req: CustomeRequest, res: Response, next: NextFunction
             lastSeenDate,
             userId,
             shelterId,
-        } );
+        });
 
-        if ( !newPet ) throw Error( "Unable to create a shelter. please try again" );
+        if (!newPet) throw Error("Unable to create a shelter. please try again");
 
         let result: GoodPet = {
 
@@ -262,21 +254,21 @@ router.post( '/', async ( req: CustomeRequest, res: Response, next: NextFunction
         result.description = newPetJson.description;
         result.userId = newPetJson.userId;
         result.shelterId = newPetJson.shelterId;
-        result.createdAt = dateConverter( newPetJson.createdAt );
-        result.updatedAt = dateConverter( newPetJson.updatedAt );
+        result.createdAt = dateConverter(newPetJson.createdAt);
+        result.updatedAt = dateConverter(newPetJson.updatedAt);
 
 
-        res.status( 201 );
-        return res.json( result );
-    } catch ( e )
+        res.status(201);
+        return res.json(result);
+    } catch (e)
     {
-        return next( e );
+        return next(e);
     }
-} );
+});
 
 //update an petable pet
 
-router.put( '/:petId', async ( req: CustomeRequest, res: Response, next: NextFunction ) =>
+router.put( '/:petId', async (req: CustomeRequest, res: Response, next: NextFunction ) =>
 {
     try
     {

@@ -15,6 +15,12 @@ export interface Pet
     description: string,
     userId: number,
     shelterId: number,
+    shelter?: any,
+    images?: any[],
+    expireDate?: Date | null,
+    lastSeenDate?: Date | null,
+    lastSeenLocation?: Date | null,
+    color: string
 }
 
 export interface IPetState

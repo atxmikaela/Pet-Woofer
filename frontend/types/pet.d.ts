@@ -10,5 +10,9 @@ export interface IPet {
     status: string,
     description: string,
     userId: number,
-    shelterId: number
+    shelterId: number,
+    expireDate: string,
+    lastSeenDate: string,
+    lastSeenLocation: string,
+    color: string,
 }

@@ -43,7 +43,6 @@ module.exports = ( sequelize: any, DataTypes: any ) => {
             },
             petId: {
                 type: DataTypes.NUMBER,
-                allowNull: false
             },
             url: {
                 type: DataTypes.STRING,
