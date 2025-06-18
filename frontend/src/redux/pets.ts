@@ -1,4 +1,4 @@
-import {IPetState, Pets, IPetAction} from "../redux/types/pets";
+import {IPetState, Pets, IPetAction, Pet} from "../redux/types/pets";
 import { csrfFetch } from "./csrf";
 
 
@@ -30,14 +30,16 @@ export const getPetsThunk = (): any => async ( dispatch: any ) => {
   };
 
   const initialState: IPetState = {
-    byId: {},
+    byId: {
+        
+    },
 
   }
 
 function petsReducer (state = initialState, action: IPetAction)
 {
 
-    let newById: IPetState;  
+    let newById: { [id: number]: Pet };  
     // let newAllPets: IPet[] = [];
 
     let newState: IPetState = {

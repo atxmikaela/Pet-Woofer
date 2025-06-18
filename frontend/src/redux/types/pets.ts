@@ -32,8 +32,7 @@ export interface IPetState
 
 export interface Pets
     {
-        byId: IPetState;
-        pets: Pet;
+        byId: { [id: number]: Pet };
     }
 
 export interface IPetAction {

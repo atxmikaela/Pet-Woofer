@@ -1,23 +1,24 @@
 
 
-export interface IImage
-{
-    byId: IImageState;
+export interface IImage {
     id: number,
     petId: number,
     url: string,
     preview: boolean;
 }
 
-export interface IImageState
-{
+export interface IImageState {
     byId: {
         [id: number]: IImage;
     },
 }
 
+export interface Images {
+    byId: { [id: number]: IImage };
+}
+
 export interface IImageAction
 {
         type: string;
-        payload: IImage;
+        payload: Images;
 }

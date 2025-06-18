@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import { getPetsThunk } from "../redux/pets";
 import { useNavigate } from "react-router-dom";
-import ImageSubmit from "../components/ImageSubmit";
+import PetCard from "../components/PetCard";
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import { styled } from '@mui/material/styles';
 
 const Splash = (): JSX.Element => {
 
@@ -32,29 +35,71 @@ const Splash = (): JSX.Element => {
         navigate(`/pet/${petId}`)
     }
 
+    const Item = styled(Paper)(({ theme }) => ({
+        backgroundColor: '#fff',
+        ...theme.typography.body2,
+        padding: theme.spacing(1),
+        textAlign: 'center',
+        color: (theme.vars ?? theme).palette.text.secondary,
+        ...theme.applyStyles('dark', {
+          backgroundColor: '#1A2027',
+        }),
+      }));
+
     if (!isLoaded) {
        return <h1>Site is loading...</h1>
     }   
 return (
     <>
-    <div className='main-contain'>
+    <Stack sx={{
+        alignItems: 'center',
+    }}>
 
         <h2>At risk of euthanasia!!</h2>
-        {atRiskPets.slice(0, 5).map(pet => (
-            <div className="pet-container" key={pet.id} onClick={(e) => viewPet(e, pet.id)}>
-                <h1>{`Pet Name - ${pet.name}`}</h1>
-            </div>
-        ))}
-    </div>
 
-        <h2>For Adoption</h2>
+
+
+
+       
+        
+            <Stack direction="row" 
+            sx={{ 
+                flexWrap: 'wrap', 
+                alignItems: 'flex-start',
+                paddingTop: '5px',
+                gap: 1,
+                width: "1200px" }}>
+            
+            {atRiskPets.slice(0, 5).map(pet => (
+            <Item sx={{
+                width: '290px',
+                height: '350px',
+                padding: 2,
+                backgroundColor: 'rgba(165, 153, 153, 0.3)',
+            }}
+            
+            
+            key={pet.id} onClick={(e) => viewPet(e, pet.id)}>
+                <PetCard pet={pet} />
+                
+                </Item>            
+        ))}
+        </Stack>
+        
+   
+
+        <Stack direction='row' sx={{
+            marginTop: '100px',
+        }}>
+            
+            For Adoption</Stack>
         {pets ? Object.values(pets).map((pet) => (
             <div className="pet-container" key={pet.id} onClick={(e) => viewPet(e, pet.id)}>
-                <h1>{`Pet Name - ${pet.name}`}</h1>
+                <PetCard pet={pet} />
             </div>
         )) : null}
     
-    <ImageSubmit />
+    </Stack>
     </>
 );
 };

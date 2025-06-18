@@ -15,15 +15,20 @@ const SinglePet: React.FC = () => {
     
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-   
+
     
     useEffect(() => {
+
+        if (!pet || Object.keys(pet).length === 0) {
         const getAdopts = async () => {
              await dispatch(getPetsThunk())
              setIsLoaded(true)
         };
         getAdopts();
-    }, [dispatch])
+    } else {
+        setIsLoaded(true);
+        }
+    }, [dispatch, pet])
 
 
 
@@ -32,7 +37,7 @@ const SinglePet: React.FC = () => {
     }   
     return (
         <>
-        <div>
+        <div className="single-pet-wrapper">
             <h1>Single Pet Page</h1>
 
                 <h1>Name: { pet.name }</h1>

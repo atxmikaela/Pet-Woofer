@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useAppDispatch } from "../hooks";
 import { useNavigate } from "react-router-dom";
-import { setImageThunk } from "../redux/images";
+import {uploadPetImagesThunk} from "../redux/images";
 
 
+interface ImageSubmitProps {
+    petId: number;
+}
 
 
-const ImageSubmit = (): JSX.Element => {
+const ImageSubmit = ({ petId }: ImageSubmitProps): JSX.Element => {
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -14,13 +17,12 @@ const ImageSubmit = (): JSX.Element => {
     const [ image, setImage ] = useState<File | null>( null );
     const [ imageLoading, setImageLoading ] = useState( false );
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) =>
-    {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!image) return;
+
         setImageLoading( true );
-        const formData = new FormData();
-        if(image) formData.append('image', image);
-        await dispatch( setImageThunk( formData ) );
+        await dispatch( uploadPetImagesThunk(petId, image));
         navigate( "/images" );
     }
 
