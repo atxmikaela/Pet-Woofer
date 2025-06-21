@@ -2,7 +2,7 @@ import { Association, CreationOptional, DataTypes, Model, Optional, ForeignKey }
 
 
 
-const { Validator } = require( 'sequelize' );
+const { Validator } = require('sequelize');
 
 type PetImageAttributes = {
     id: number,
@@ -16,26 +16,24 @@ type PetImageAttributes = {
 type PetImageCreationAttribute = Optional<
     PetImageAttributes, 'id'>;
 
-module.exports = ( sequelize: any, DataTypes: any ) => {
+module.exports = (sequelize: any, DataTypes: any) => {
 
     class PetImage extends Model<PetImageAttributes, PetImageCreationAttribute>
     {
         declare id: CreationOptional<number>;
-        declare petId: ForeignKey<PetImage[ 'id' ]>;
+        declare petId: ForeignKey<PetImage['id']>;
         declare url: string;
         declare preview: boolean;
 
 
-        static associate ( models: any )
-        {
-            PetImage.belongsTo( models.Pet, { foreignKey: 'petId' } );
+        static associate (models: any){
+            PetImage.belongsTo(models.Pet, { foreignKey: 'petId' });
         }
 
         // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 
     }
-    PetImage.init(
-        {
+    PetImage.init({
             id: {
                 type: DataTypes.INTEGER,
                 autoIncrement: true,
@@ -53,16 +51,15 @@ module.exports = ( sequelize: any, DataTypes: any ) => {
                 allowNull: false,
             }
 
-        },
-        {
+        },{
             sequelize,
             modelName: "PetImage",
             defaultScope: {
                 attributes: {
-                    exclude: [ "createdAt", "updatedAt" ]
+                    exclude: ["createdAt", "updatedAt"]
                 }
             },
         }
-    );
+   );
     return PetImage;
 };

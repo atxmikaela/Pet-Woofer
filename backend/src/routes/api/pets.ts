@@ -6,6 +6,9 @@ import { Op } from 'sequelize';
 import { dateConverter } from "../../utils/date-conversion";
 import { GoodPet } from "../../typings/data";
 import { ForbiddenError, NoResourceError, UnauthorizedError } from "../../errors/customErrors";
+import {setTokenCookie} from "../../utils/auth";
+const { singleFileUpload, singleMulterUpload } = require("../../awsS3");
+const { multiplePublicFileUpload, multipleMulterUpload } = require('../../awsS3');
 
 
 const { Pet, Shelter, User } = db;
@@ -48,7 +51,7 @@ router.get('/', validateQueryParams, async (req: Request, res: Response, next: N
             const transformed = petTransform(pet);
             acc[transformed.id] = transformed;
             return acc;
-        }, {} );
+        }, {});
         // const allPets: any[] = [];
 
         // petTransform.forEach((pet: any) => {
@@ -66,7 +69,7 @@ router.get('/', validateQueryParams, async (req: Request, res: Response, next: N
 
 // Get one petable pet by petable pet ID:
 
-router.get('/:id', validateQueryParams, async ( req: Request, res: Response, next: NextFunction ) => {
+router.get('/:id', validateQueryParams, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const petId = req.params.id;
         const pet = await Pet.findByPk(petId, {
@@ -80,7 +83,7 @@ router.get('/:id', validateQueryParams, async ( req: Request, res: Response, nex
                     as: 'images'
                 }
             ]
-        } );
+        });
 
         if (!pet) throw new NoResourceError("Petable pet couldn't be found", 404);
         res.status(200);
@@ -93,7 +96,7 @@ router.get('/:id', validateQueryParams, async ( req: Request, res: Response, nex
 
 // Get all petable pets owned by current user: 
 
-router.get( '/my-pets/:userId', async ( req: CustomeRequest, res: Response, next: NextFunction ) => {
+router.get('/my-pets/:userId', async (req: CustomeRequest, res: Response, next: NextFunction) => {
     try {
         const userId = req.params.userId;
         const pets = await Pet.findAll({
@@ -128,7 +131,7 @@ router.get('/by-shelter/:shelterId', async (req: CustomeRequest, res: Response, 
     try
     {
         const shelterId = req.params.shelterId;
-        const pets = await Pet.findAll( {
+        const pets = await Pet.findAll({
             where: {
                 shelterId: shelterId
             },
@@ -137,7 +140,7 @@ router.get('/by-shelter/:shelterId', async (req: CustomeRequest, res: Response, 
             ]
         });
 
-        const petTransform = pets.map( (pet: any) =>
+        const petTransform = pets.map((pet: any) =>
         {
             const petJson = pet.toJSON();
             const { Rescue, ...res } = petJson;
@@ -245,7 +248,7 @@ router.post('/', async (req: CustomeRequest, res: Response, next: NextFunction) 
         result.age = newPetJson.age;
         result.gender = newPetJson.gender;
         result.size = newPetJson.size;
-        result.fee = Number( newPetJson.fee );
+        result.fee = Number(newPetJson.fee);
         result.status = newPetJson.status;
         result.lastSeenLocation = newPetJson.lastSeenLocation;
         result.lastSeenDate = newPetJson.lastSeenDate;
@@ -266,103 +269,128 @@ router.post('/', async (req: CustomeRequest, res: Response, next: NextFunction) 
     }
 });
 
+
+// backend/routes/api/users.js
+
+router.post(
+    '/:petId/images',
+    singleMulterUpload("image"),
+    async (req: any, res: any) => {
+      const petId = req.params.petId;
+      const imageUrl = await singleFileUpload(req.file);
+      const petImage = await db.PetImage.create({ 
+        petId: Number(petId),
+        url: imageUrl,
+        preview: false
+      });
+    
+      return res.json({ imageUrl, petImage });
+    }
+  );
+
+
+  router.post(
+    '/:petId/multiple',
+    multipleMulterUpload("image"),
+    async (req: any, res: any) => {
+
+      const imageUrls = await multiplePublicFileUpload(req.files);
+
+      const petImages = await Promise.all(
+      imageUrls.map((url: string) =>
+        db.PetImage.create({
+            petId: Number(req.params.petId),
+            url: url,
+            preview: false
+        })
+      )
+    );
+      return res.json({ imageUrls, petImages });
+    }
+  );
+
+
 //update an petable pet
 
-router.put( '/:petId', async (req: CustomeRequest, res: Response, next: NextFunction ) =>
+router.put('/:petId', async (req: CustomeRequest, res: Response, next: NextFunction) =>
 {
     try
     {
-        if ( req.params.petId )
+        if (req.params.petId)
         {
             let petId = req.params.petId;
 
-            if ( !req.body ) throw new NoResourceError( 'You must pass in a body to update an petable pet', 400 );
+            if (!req.body) throw new NoResourceError('You must pass in a body to update an petable pet', 400);
 
             let { newName, newSpecies, newBreed, newAge, newGender, newSize, newFee, newStatus, newDescription, newUserId, newShelterId, newColor, newExpireDate, newLastSeenLocation, newLastSeenDate } = req.body;
 
 
-            const oldPet = await Pet.findByPk( petId );
-            if ( !oldPet ) throw new NoResourceError( "Adoptable pet couldn't be found, 404" );
+            const oldPet = await Pet.findByPk(petId);
+            if (!oldPet) throw new NoResourceError("Adoptable pet couldn't be found, 404");
             let { ...response } = oldPet.toJSON();
 
             //User.id is questionable - should be userId?
-            if ( response.userId !== oldPet.userId )
-            {
-                throw new UnauthorizedError( "You are not authorized to edit this shelter", 401 );
+            if (response.userId !== oldPet.userId) {
+                throw new UnauthorizedError("You are not authorized to edit this shelter", 401);
             } else
             
-            if ( newName && response.name !== newName )
-            {
+            if (newName && response.name !== newName) {
                 oldPet.name = newName;
                 response.name = newName;
             }
-            if ( newSpecies && response.species !== newSpecies )
-            {
+            if (newSpecies && response.species !== newSpecies) {
                 oldPet.species = newSpecies;
                 response.species = newSpecies;
             }
-            if ( newBreed && response.breed !== newBreed )
-            {
+            if (newBreed && response.breed !== newBreed) {
                 oldPet.breed = newBreed;
                 response.breed = newBreed;
             }
-            if ( newAge && response.age !== newAge )
-            {
+            if (newAge && response.age !== newAge) {
                 oldPet.age = newAge;
                 response.age = newAge;
             }
-            if ( newGender && response.gender !== newGender )
-            {
+            if (newGender && response.gender !== newGender) {
                 oldPet.gender = newGender;
                 response.gender = newGender;
             }
-            if ( newSize && response.size !== newSize )
-            {
+            if (newSize && response.size !== newSize) {
                 oldPet.size = newSize;
                 response.size = newSize;
             }
-            if ( newFee && response.fee !== newFee )
-            {
+            if (newFee && response.fee !== newFee) {
                 oldPet.fee = newFee;
                 response.fee = newFee;
             }
-            if ( newStatus && response.status !== newStatus )
-            {
+            if (newStatus && response.status !== newStatus) {
                 oldPet.status = newStatus;
                 response.status = newStatus;
             }
-            if ( newColor && response.newColor !== newColor )
-            {
+            if (newColor && response.newColor !== newColor) {
                 oldPet.newColor = newColor;
                 response.newColor = newColor;
             }
-            if ( newExpireDate && response.expireDate !== newExpireDate )
-            {
+            if (newExpireDate && response.expireDate !== newExpireDate) {
                 oldPet.expireDate = newExpireDate;
                 response.expireDate = newExpireDate;
             }
-            if ( newLastSeenDate && response.lastSeenDate !== newLastSeenDate )
-            {
+            if (newLastSeenDate && response.lastSeenDate !== newLastSeenDate) {
                 oldPet.lastSeenDate = newLastSeenDate;
                 response.lastSeenDate = newLastSeenDate;
             }
-            if ( newLastSeenLocation && response.lastSeenLocation !== newLastSeenLocation )
-            {
+            if (newLastSeenLocation && response.lastSeenLocation !== newLastSeenLocation) {
                 oldPet.lastSeenLocation = newLastSeenLocation;
                 response.lastSeenLocation = newLastSeenLocation;
             }
-            if ( newDescription && response.description !== newDescription )
-            {
+            if (newDescription && response.description !== newDescription) {
                 oldPet.description = newDescription;
                 response.description = newDescription;
             }
-            if ( newUserId && response.userId !== newUserId )
-            {
+            if (newUserId && response.userId !== newUserId) {
                 oldPet.userId = newUserId;
                 response.userId = newUserId;
             }
-            if ( newShelterId && response.shelterId !== newShelterId )
-            {
+            if (newShelterId && response.shelterId !== newShelterId) {
                 oldPet.shelterId = newShelterId;
                 response.shelterId = newShelterId;
             }
@@ -370,43 +398,42 @@ router.put( '/:petId', async (req: CustomeRequest, res: Response, next: NextFunc
 
                 //newDescription, newUserId, newShelterId
                 await oldPet.save();
-                res.status( 200 );
-                res.json( oldPet );
+                res.status(200);
+                res.json(oldPet);
           
             } else
                 {
-                    throw new NoResourceError( "Adoptable pet couldn't be found", 404 );
+                    throw new NoResourceError("Adoptable pet couldn't be found", 404);
                 }
-            } catch ( error )
-            {
-                return res.json( { message: error } );
+            } catch (error)  {
+                return res.json({ message: error });
             }
             });
 
 //delete an petable pet
 
-router.delete( '/:petId', async ( req: CustomeRequest, res: Response, next: NextFunction ) =>
+router.delete('/:petId', async (req: CustomeRequest, res: Response, next: NextFunction) =>
 {
 
     try
     {
-        if ( !req.user ) throw new UnauthorizedError( 'You must be signed in to perform this action' );
+        if (!req.user) throw new UnauthorizedError('You must be signed in to perform this action');
         let userId = req.user.id;
         let petId: string | number = req.params.petId;
-        if ( !petId ) throw new Error( 'Please pass in a valid shelter id' );
+        if (!petId) throw new Error('Please pass in a valid shelter id');
 
-        petId = Number( petId );
-        let pet = await Pet.findByPk( petId );
-        if ( !pet ) throw new NoResourceError( "Petable pet couldn't be found", 404 );
+        petId = Number(petId);
+        let pet = await Pet.findByPk(petId);
+        if (!pet) throw new NoResourceError("Petable pet couldn't be found", 404);
         let petJSON = await pet.toJSON();
-        if ( petJSON.userId !== userId ) throw new ForbiddenError( 'Forbidden: This is not your petable pet!' );
+        if (petJSON.userId !== userId) throw new ForbiddenError('Forbidden: This is not your petable pet!');
         pet.destroy();
-        return res.json( pet );
-    } catch ( e )
+        return res.json(pet);
+    } catch (e)
     {
-        return next( e );
+        return next(e);
     }
-} );
+});
 
 export = router;
 
