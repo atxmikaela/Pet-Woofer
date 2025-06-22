@@ -8,7 +8,7 @@ interface PetProps {
     pet: Pet;
     }
 
-function PetCard({ pet }: PetProps): JSX.Element {
+function PetCard({pet}: PetProps): JSX.Element {
 
 return (
 	<>
