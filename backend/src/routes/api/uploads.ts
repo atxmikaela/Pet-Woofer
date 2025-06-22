@@ -5,8 +5,6 @@ import db from '../../db/models';
 import express from 'express';
 const router = express.Router();
 
-console.log('=== UPLOADS ROUTER LOADED ===');
-
 router.post('/images/:petId',
 
     multipleMulterUpload("image"),
