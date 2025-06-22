@@ -1,5 +1,4 @@
 import {IImageState, IImageAction, IImage} from "./types/images";
-import { csrfFetch } from "./csrf";
 
 const SET_IMAGES = 'images/setImages';
 
@@ -9,58 +8,11 @@ const setImages = (images: IImage) => ({
 });
 
 
-// export const getImageThunk = (): any => async ( dispatch: any ) => {
-//     try {
-//         const response = await csrfFetch( "/api/images", );
-//         if (response.ok) {
-//             const data = await response.json();
-//             if (data.errors) {
-//                 throw response;
-//             }
-//             dispatch(setImage(data));
-//         } else {
-//             throw response;
-//         }
-//     } catch (e) {
-//         const err = e as Response;
-//         return await err.json();
-//     }
-//   };
-
-
-export const getImageThunk = (post: any): any => async (dispatch: any) =>
-{
-    try
-    {
-        const response = await csrfFetch( "/api/images/new", {
-            method: "POST",
-            body: post,
-            headers: undefined
-        });
-
-        if (response.ok)
-        {
-            const {resPost} = await response.json();
-            if (resPost.errors)
-            {
-                throw response;
-            }
-            dispatch(setImages(resPost));
-        } else
-        {
-            throw response;
-        }
-    } catch (e)
-    {
-        const err = e as Response;
-        return await err.json();
-    }
-};
 
 
 export const getPetImagesThunk = (petId: number): any => async (dispatch: any) => {
     try {
-        const response = await csrfFetch(`/api/pets/${petId}/images`);
+        const response = await fetch(`/api/pets/${petId}/images`);
         if (response.ok) {
             const data = await response.json();
             if (data.errors) {
@@ -77,41 +29,16 @@ export const getPetImagesThunk = (petId: number): any => async (dispatch: any) =
 }
 
 
-export const uploadPetImagesThunk = (petId: number, imageFile: File): any => async (dispatch: any) => {
-    try {
-        const  formData = new FormData();
-        formData.append('image', imageFile);
 
-        const response = await csrfFetch(`/api/pets/${petId}/images`, {
-            method: 'POST',
-            body: formData,
-            headers: undefined
+
+export const uploadMultiplePetImagesThunk = (petId: number, imageFiles: File[]): any => async (dispatch: any) => {
+    try {
+        const  formData = new FormData();     
+        imageFiles.forEach((file) => {
+            formData.append('image', file);
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            if (data.errors) {
-                throw response;
-            }
-            return data;
-        } else {
-            throw response;
-        }
-    } catch (e) {
-        const err = e as Response;
-        return await err.json();
-    
-    }
-};
-
-
-export const uploadMultiplePetImagesThunk = (petId: number, imageFiles: FileList): any => async (dispatch: any) => {
-    try {
-        const  formData = new FormData();
-        for (let i = 0; i < imageFiles.length; i++) {
-        formData.append('images', 'imageFile[i]');
-        }
-        const response = await csrfFetch(`/api/pets/${petId}/images`, {
+        const response = await fetch(`/uploads/images/${petId}`, {
             method: 'POST',
             body: formData,
             headers: undefined
@@ -133,6 +60,24 @@ export const uploadMultiplePetImagesThunk = (petId: number, imageFiles: FileList
     
     }
 };
+
+export const deleteImageThunk = (id: any): any => async (dispatch: any) => {
+    try {
+        const response = await fetch(`/uploads/images/${id}`, {
+            method: 'DELETE',
+        });
+
+        if(response.ok) {
+            dispatch(setImages(id))
+            return { success: true };
+        } else {
+            throw response;
+        }
+    } catch (e) {
+        const err = e as Response;
+        return await err.json();
+    }
+}
 
 
 

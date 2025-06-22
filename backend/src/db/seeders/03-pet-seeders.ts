@@ -14,7 +14,6 @@ module.exports = {
     options.tableName = 'Pets';
     return queryInterface.bulkInsert(options, [
       {
-        id: 1,
         name: "Buddy",
         species: "Dog",
         breed: "Labrador Retriever Mix",
@@ -31,8 +30,7 @@ module.exports = {
         userId: 4,
         shelterId: 4,
       },
-      {
-        id: 2,
+      {        
         name: "Luna",
         species: "Cat",
         breed: "Domestic Shorthair",
@@ -49,8 +47,7 @@ module.exports = {
         userId: 4,
         shelterId: 4,
       },
-      {
-        id: 3,
+      {        
         name: "Max",
         species: "Dog",
         breed: "German Shepherd Mix",
@@ -67,8 +64,7 @@ module.exports = {
         userId: 4,
         shelterId: 4,
       },
-      {
-        id: 4,
+      {        
         name: "Patches",
         species: "Cat",
         breed: "Tabby Mix",
@@ -85,8 +81,7 @@ module.exports = {
         userId: 4,
         shelterId: 4,
       },
-      {
-        id: 5,
+      {        
         name: "Charlie",
         species: "Dog",
         breed: "Golden Retriever Mix",
@@ -103,8 +98,7 @@ module.exports = {
         userId: 2,
         shelterId: 2,
       },
-      {
-        id: 6,
+      {        
         name: "Princess",
         species: "Cat",
         breed: "Persian Mix",
@@ -121,8 +115,7 @@ module.exports = {
         userId: 2,
         shelterId: 2,
       },
-      {
-        id: 7,
+      {        
         name: "Ranger",
         species: "Dog",
         breed: "Border Collie Mix",
@@ -139,8 +132,7 @@ module.exports = {
         userId: 2,
         shelterId: 2,
       },
-      {
-        id: 8,
+      {        
         name: "Daisy",
         species: "Dog",
         breed: "Cocker Spaniel Mix",
@@ -157,8 +149,7 @@ module.exports = {
         userId: 3,
         shelterId: 3,
       },
-      {
-        id: 9,
+      {        
         name: "Oliver",
         species: "Cat",
         breed: "Tuxedo",
@@ -176,7 +167,6 @@ module.exports = {
         shelterId: 3,
       },
       {
-        id: 10,
         name: "Ruby",
         species: "Dog",
         breed: "Dachshund Mix",
@@ -194,7 +184,6 @@ module.exports = {
         shelterId: 3,
       },
       {
-        id: 11,
         name: "Zeus",
         species: "Dog",
         breed: "Great Dane Mix",
@@ -212,7 +201,6 @@ module.exports = {
         shelterId: 1,
       },
       {
-        id: 12,
         name: "Nala",
         species: "Cat",
         breed: "Bengal Mix",
@@ -230,7 +218,6 @@ module.exports = {
         shelterId: 1,
       },
       {
-        id: 13,
         name: "Rusty",
         species: "Dog",
         breed: "Cattle Dog Mix",
@@ -248,7 +235,6 @@ module.exports = {
         shelterId: 5,
       },
       {
-        id: 14,
         name: "Dolly",
         species: "Dog",
         breed: "Beagle Hound Mix",
@@ -266,7 +252,6 @@ module.exports = {
         shelterId: 5,
       },
       {
-        id: 15,
         name: "Tucker",
         species: "Dog",
         breed: "Lab Pit Mix",
@@ -284,7 +269,6 @@ module.exports = {
         shelterId: 5,
       },
       {
-        id: 16,
         name: "Willow",
         species: "Dog",
         breed: "Australian Shepherd Mix",
@@ -302,7 +286,6 @@ module.exports = {
         shelterId: 6,
       },
       {
-        id: 17,
         name: "Forest",
         species: "Cat",
         breed: "Maine Coon Mix",
@@ -320,7 +303,6 @@ module.exports = {
         shelterId: 6,
       },
       {
-        id: 18,
         name: "Austin",
         species: "Dog",
         breed: "Labrador Mix",
@@ -338,7 +320,6 @@ module.exports = {
         shelterId: 7,
       },
       {
-        id: 19,
         name: "Bluebonnet",
         species: "Cat",
         breed: "Russian Blue Mix",
@@ -356,7 +337,6 @@ module.exports = {
         shelterId: 7,
       },
       {
-        id: 20,
         name: "Mittens",
         species: "Cat",
         breed: "Calico",
@@ -374,7 +354,6 @@ module.exports = {
         shelterId: null, 
       },
       {
-        id: 21,
         name: "Shadow",
         species: "Dog",
         breed: "German Shepherd",
@@ -386,13 +365,12 @@ module.exports = {
         status: "missing",
         expireDate: null,
         lastSeenLocation: "Bow Lane",
-        lastSeenDate: "2025-06-012T07:18:16.077Z",
+        lastSeenDate: "2025-06-12T07:18:16.077Z",
         description: "Shadow is a large German Shepherd who escaped from his yard during a storm. He's friendly but may be scared. Please approach carefully and contact owner immediately if seen.",
         userId: 5, 
         shelterId: null, 
       },
       {
-        id: 22,
         name: "Lucky",
         species: "Dog",
         breed: "Beagle Mix",
@@ -410,7 +388,6 @@ module.exports = {
         shelterId: null, 
       },
       {
-        id: 23,
         name: "Bella",
         species: "Cat",
         breed: "Domestic Shorthair",
@@ -428,7 +405,6 @@ module.exports = {
         shelterId: null, 
       },
       {
-        id: 24,
         name: "Tex",
         species: "Dog",
         breed: "Blue Heeler Mix",
@@ -446,7 +422,6 @@ module.exports = {
         shelterId: 4,
       },
       {
-        id: 25,
         name: "Peaches",
         species: "Cat",
         breed: "Orange Persian Mix",
@@ -464,7 +439,6 @@ module.exports = {
         shelterId: 4,
       },
       {
-        id: 26,
         name: "Cowboy",
         species: "Dog",
         breed: "Cattle Dog Mix",
@@ -482,7 +456,6 @@ module.exports = {
         shelterId: 2,
       },
       {
-        id: 27,
         name: "Honey",
         species: "Dog",
         breed: "Golden Retriever",
@@ -500,7 +473,6 @@ module.exports = {
         shelterId: 3,
       },
       {
-        id: 28,
         name: "Storm",
         species: "Cat",
         breed: "Gray Tabby",
@@ -518,7 +490,6 @@ module.exports = {
         shelterId: 3,
       },
       {
-        id: 29,
         name: "Maverick",
         species: "Dog",
         breed: "Husky Mix",
@@ -536,7 +507,6 @@ module.exports = {
         shelterId: 5,
       },
       {
-        id: 30,
         name: "Jasper",
         species: "Cat",
         breed: "Maine Coon",

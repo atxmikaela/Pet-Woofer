@@ -7,6 +7,14 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 
+
+
+
+
+
+
+
+
 const Splash = (): JSX.Element => {
 
     const dispatch = useAppDispatch();
@@ -51,31 +59,21 @@ const Splash = (): JSX.Element => {
     }   
 return (
     <>
-    <Stack sx={{
-        alignItems: 'center',
-    }}>
-
-        <h2>At risk of euthanasia!!</h2>
-
-
-
-
-       
-        
+             
             <Stack direction="row" 
             sx={{ 
                 flexWrap: 'wrap', 
                 alignItems: 'flex-start',
                 paddingTop: '5px',
                 gap: 1,
-                width: "1200px" }}>
+                 }}>
             
             {atRiskPets.slice(0, 5).map(pet => (
             <Item sx={{
                 width: '290px',
                 height: '350px',
                 padding: 2,
-                backgroundColor: 'rgba(165, 153, 153, 0.3)',
+                backgroundColor: 'rgb(255, 255, 255)',
             }}
             
             
@@ -86,20 +84,41 @@ return (
         ))}
         </Stack>
         
-   
+        <h2>For Adoption</h2>
 
         <Stack direction='row' sx={{
             marginTop: '100px',
         }}>
+       
             
-            For Adoption</Stack>
-        {pets ? Object.values(pets).map((pet) => (
-            <div className="pet-container" key={pet.id} onClick={(e) => viewPet(e, pet.id)}>
+
+            <Stack direction="row" 
+            sx={{ 
+                flexWrap: 'wrap', 
+                alignItems: 'flex-start',
+                paddingTop: '5px',
+                gap: 1,
+                }}>
+            
+            {pets ? Object.values(pets).map(pet => (
+            <Item sx={{
+                width: '290px',
+                height: '350px',
+                padding: 2,
+                backgroundColor: 'rgb(255, 255, 255)',
+            }}
+            
+            
+            key={pet.id} onClick={(e) => viewPet(e, pet.id)}>
                 <PetCard pet={pet} />
-            </div>
+                
+                </Item>            
         )) : null}
+            </Stack>
+            </Stack>
+   
     
-    </Stack>
+  
     </>
 );
 };

@@ -1,4 +1,3 @@
-import { text } from 'aws-sdk/clients/customerprofiles';
 import { Association, CreationOptional, DataTypes, Model, Optional, type BelongsToGetAssociationMixin, type ForeignKey, type HasManyAddAssociationMixin, type HasManyCreateAssociationMixin, type HasManyGetAssociationsMixin } from 'sequelize';
 
 const { Validator } = require('sequelize');
@@ -12,7 +11,7 @@ type PetAttributes = {
     description: string,
     gender: string,
     size: string,
-    color?: string | null;
+    color?: string,
     status: 'adopted' | 'missing' | 'found' | 'available' | 'protective custody' | 'not available' | 'expired',
     expireDate?: Date | null;
     lastSeenLocation?: string | null;
@@ -39,7 +38,7 @@ module.exports = (sequelize: any, DataTypes: any) => {
         declare description: string;
         declare gender: string;
         declare size: string;
-        declare color: string | null;
+        declare color: string;
         declare status: 'adopted' | 'missing' | 'found' | 'available' | 'protective custody' | 'not available' | 'expired';
         declare expireDate: Date | null;
         declare lastSeenLocation: string | null;
@@ -122,6 +121,10 @@ module.exports = (sequelize: any, DataTypes: any) => {
                 type: DataTypes.STRING(10),
                 allowNull: false
             },
+            color: {
+                type: DataTypes.STRING(10),
+                allowNull: false
+            },
             gender: {
                 type: DataTypes.STRING(10),
                 allowNull: false
@@ -154,7 +157,6 @@ module.exports = (sequelize: any, DataTypes: any) => {
             },
             shelterId: {
                 type: DataTypes.INTEGER,
-                allowNull: false,
                 references: {
                     model: 'Shelters',
                     key: 'id'

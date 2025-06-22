@@ -40,7 +40,12 @@ module.exports = (sequelize: any, DataTypes: any) => {
                 primaryKey: true
             },
             petId: {
-                type: DataTypes.NUMBER,
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                references: {
+                    model: 'Pets',
+                    key: 'id'
+                }
             },
             url: {
                 type: DataTypes.STRING,

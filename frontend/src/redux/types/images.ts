@@ -1,7 +1,7 @@
 
 
 export interface IImage {
-    id: number,
+    id: number | string,
     petId: number,
     url: string,
     preview: boolean;

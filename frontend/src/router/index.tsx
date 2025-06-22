@@ -4,6 +4,7 @@ import SignupFormPage from '../components/SignupFormPage';
 import Layout from './Layout';
 import Home from '../pages/Splash';
 import SinglePet from '../pages/SinglePet';
+import CreatePet from '../pages/CreatePet';
 
 export const router = createBrowserRouter([
   {
@@ -16,6 +17,10 @@ export const router = createBrowserRouter([
       {
         path: "/pet/:id",
         element: <SinglePet />,
+      },
+      {
+        path: "/pet/add",
+        element: <CreatePet />,
       },
       {
         path: "login",

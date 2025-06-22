@@ -7,10 +7,7 @@ const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 const config = require('../../config/database')[env];
 
-
 const db:any = {};
-
-
 
 let sequelize: any;
 if (config.use_env_variable) {

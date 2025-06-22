@@ -27,7 +27,7 @@ return <Card sx={{ maxWidth: 310,
             />
        <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-         {`Pet Name - ${pet.name}`}
+         {pet.name}
           </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {pet.shelter?.name || 'Unknown'}

@@ -37,10 +37,10 @@ module.exports = {
         allowNull: false
       },
       lat: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(10, 8),
       },
       lon: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(10, 8),
       },
       phone: {
         type: Sequelize.STRING(14),

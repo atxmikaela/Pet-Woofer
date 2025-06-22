@@ -7,8 +7,7 @@ import { dateConverter } from "../../utils/date-conversion";
 import { GoodPet } from "../../typings/data";
 import { ForbiddenError, NoResourceError, UnauthorizedError } from "../../errors/customErrors";
 import {setTokenCookie} from "../../utils/auth";
-const { singleFileUpload, singleMulterUpload } = require("../../awsS3");
-const { multiplePublicFileUpload, multipleMulterUpload } = require('../../awsS3');
+import { requireAuth } from "../../utils/auth";
 
 
 const { Pet, Shelter, User } = db;
@@ -54,10 +53,6 @@ router.get('/', validateQueryParams, async (req: Request, res: Response, next: N
         }, {});
         // const allPets: any[] = [];
 
-        // petTransform.forEach((pet: any) => {
-        //     byId[pet.id] = pet;
-        //     allPets.push(pet);
-        // });
 
 
         res.status(200).json({ byId });
@@ -85,7 +80,7 @@ router.get('/:id', validateQueryParams, async (req: Request, res: Response, next
             ]
         });
 
-        if (!pet) throw new NoResourceError("Petable pet couldn't be found", 404);
+        if (!pet) throw new NoResourceError("Pet couldn't be found", 404);
         res.status(200);
         res.json(pet);
     } catch (e)
@@ -94,7 +89,7 @@ router.get('/:id', validateQueryParams, async (req: Request, res: Response, next
     }
 });
 
-// Get all petable pets owned by current user: 
+// Get pets owned by current user: 
 
 router.get('/my-pets/:userId', async (req: CustomeRequest, res: Response, next: NextFunction) => {
     try {
@@ -125,7 +120,7 @@ router.get('/my-pets/:userId', async (req: CustomeRequest, res: Response, next: 
     }
 });
 
-// get an petable pet by shelter
+// get a pet by shelter
 router.get('/by-shelter/:shelterId', async (req: CustomeRequest, res: Response, next: NextFunction) =>
 {
     try
@@ -196,7 +191,6 @@ router.post('/', async (req: CustomeRequest, res: Response, next: NextFunction) 
 
 
 
-        // creates new petable pet
         const newPet = await Pet.create({
             name,
             species,
@@ -270,49 +264,10 @@ router.post('/', async (req: CustomeRequest, res: Response, next: NextFunction) 
 });
 
 
-// backend/routes/api/users.js
 
-router.post(
-    '/:petId/images',
-    singleMulterUpload("image"),
-    async (req: any, res: any) => {
-      const petId = req.params.petId;
-      const imageUrl = await singleFileUpload(req.file);
-      const petImage = await db.PetImage.create({ 
-        petId: Number(petId),
-        url: imageUrl,
-        preview: false
-      });
-    
-      return res.json({ imageUrl, petImage });
-    }
-  );
+//update an pet
 
-
-  router.post(
-    '/:petId/multiple',
-    multipleMulterUpload("image"),
-    async (req: any, res: any) => {
-
-      const imageUrls = await multiplePublicFileUpload(req.files);
-
-      const petImages = await Promise.all(
-      imageUrls.map((url: string) =>
-        db.PetImage.create({
-            petId: Number(req.params.petId),
-            url: url,
-            preview: false
-        })
-      )
-    );
-      return res.json({ imageUrls, petImages });
-    }
-  );
-
-
-//update an petable pet
-
-router.put('/:petId', async (req: CustomeRequest, res: Response, next: NextFunction) =>
+router.put('/:petId', requireAuth, async (req: CustomeRequest, res: Response, next: NextFunction) =>
 {
     try
     {
@@ -322,111 +277,140 @@ router.put('/:petId', async (req: CustomeRequest, res: Response, next: NextFunct
 
             if (!req.body) throw new NoResourceError('You must pass in a body to update an petable pet', 400);
 
-            let { newName, newSpecies, newBreed, newAge, newGender, newSize, newFee, newStatus, newDescription, newUserId, newShelterId, newColor, newExpireDate, newLastSeenLocation, newLastSeenDate } = req.body;
+            let { name, species, breed, age, gender, size, fee, status, description, userId, shelterId, color, expireDate, lastSeenLocation, lastSeenDate } = req.body;
 
 
             const oldPet = await Pet.findByPk(petId);
             if (!oldPet) throw new NoResourceError("Adoptable pet couldn't be found, 404");
             let { ...response } = oldPet.toJSON();
 
+            if (!req.user) {
+                throw new UnauthorizedError("You must be logged in to edit pets", 401)
+            }
+
+            let hasCred = false;
+
+            if (req.user.id === oldPet.userId || req.user.role === 'Admin' || req.user.role === 'KPA Staff' || req.user.role === 'KPA Volunteer' || req.user.shelterId === shelterId) {
+                hasCred = true;
+            }
+
             //User.id is questionable - should be userId?
-            if (response.userId !== oldPet.userId) {
-                throw new UnauthorizedError("You are not authorized to edit this shelter", 401);
+            if (!hasCred) {
+                throw new UnauthorizedError("You are not authorized to edit this pet", 401);
             } else
             
-            if (newName && response.name !== newName) {
-                oldPet.name = newName;
-                response.name = newName;
+            if (name && response.name !== name) {
+                oldPet.name = name;
+                response.name = name;
             }
-            if (newSpecies && response.species !== newSpecies) {
-                oldPet.species = newSpecies;
-                response.species = newSpecies;
+            if (species && response.species !== species) {
+                oldPet.species = species;
+                response.species = species;
             }
-            if (newBreed && response.breed !== newBreed) {
-                oldPet.breed = newBreed;
-                response.breed = newBreed;
+            if (breed && response.breed !== breed) {
+                oldPet.breed = breed;
+                response.breed = breed;
             }
-            if (newAge && response.age !== newAge) {
-                oldPet.age = newAge;
-                response.age = newAge;
+            if (age && response.age !== age) {
+                oldPet.age = age;
+                response.age = age;
             }
-            if (newGender && response.gender !== newGender) {
-                oldPet.gender = newGender;
-                response.gender = newGender;
+            if (gender && response.gender !== gender) {
+                oldPet.gender = gender;
+                response.gender = gender;
             }
-            if (newSize && response.size !== newSize) {
-                oldPet.size = newSize;
-                response.size = newSize;
+            if (size && response.size !== size) {
+                oldPet.size = size;
+                response.size = size;
             }
-            if (newFee && response.fee !== newFee) {
-                oldPet.fee = newFee;
-                response.fee = newFee;
+            if (fee && response.fee !== fee) {
+                oldPet.fee = fee;
+                response.fee = fee;
             }
-            if (newStatus && response.status !== newStatus) {
-                oldPet.status = newStatus;
-                response.status = newStatus;
+            if (status && response.status !== status) {
+                oldPet.status = status;
+                response.status = status;
             }
-            if (newColor && response.newColor !== newColor) {
-                oldPet.newColor = newColor;
-                response.newColor = newColor;
+            if (color && response.color !== color) {
+                oldPet.color = color;
+                response.color = color;
             }
-            if (newExpireDate && response.expireDate !== newExpireDate) {
-                oldPet.expireDate = newExpireDate;
-                response.expireDate = newExpireDate;
+            if (expireDate && response.expireDate !== expireDate) {
+                oldPet.expireDate = expireDate;
+                response.expireDate = expireDate;
             }
-            if (newLastSeenDate && response.lastSeenDate !== newLastSeenDate) {
-                oldPet.lastSeenDate = newLastSeenDate;
-                response.lastSeenDate = newLastSeenDate;
+            if (lastSeenDate && response.lastSeenDate !== lastSeenDate) {
+                oldPet.lastSeenDate = lastSeenDate;
+                response.lastSeenDate = lastSeenDate;
             }
-            if (newLastSeenLocation && response.lastSeenLocation !== newLastSeenLocation) {
-                oldPet.lastSeenLocation = newLastSeenLocation;
-                response.lastSeenLocation = newLastSeenLocation;
+            if (lastSeenLocation && response.lastSeenLocation !== lastSeenLocation) {
+                oldPet.lastSeenLocation = lastSeenLocation;
+                response.lastSeenLocation = lastSeenLocation;
             }
-            if (newDescription && response.description !== newDescription) {
-                oldPet.description = newDescription;
-                response.description = newDescription;
+            if (description && response.description !== description) {
+                oldPet.description = description;
+                response.description = description;
             }
-            if (newUserId && response.userId !== newUserId) {
-                oldPet.userId = newUserId;
-                response.userId = newUserId;
+            if (userId && response.userId !== userId) {
+                oldPet.userId = userId;
+                response.userId = userId;
             }
-            if (newShelterId && response.shelterId !== newShelterId) {
-                oldPet.shelterId = newShelterId;
-                response.shelterId = newShelterId;
+            if (shelterId && response.shelterId !== shelterId) {
+                oldPet.shelterId = shelterId;
+                response.shelterId = shelterId;
             }
             
-
-                //newDescription, newUserId, newShelterId
                 await oldPet.save();
-                res.status(200);
-                res.json(oldPet);
+
+            const updatePetWithImages = await Pet.findByPk(petId, {
+                include: [
+                    {
+                        model: Shelter,
+                        as: 'shelter'
+                    },
+                    {
+                        model: db.PetImage,
+                        as: 'images'
+                    }
+                ]
+            });
+
+
+                res.status(200).json(updatePetWithImages);
           
             } else
                 {
                     throw new NoResourceError("Adoptable pet couldn't be found", 404);
                 }
             } catch (error)  {
-                return res.json({ message: error });
+                return next(error)
+               
             }
             });
 
-//delete an petable pet
+//delete a pet
 
-router.delete('/:petId', async (req: CustomeRequest, res: Response, next: NextFunction) =>
-{
-
+router.delete('/:petId', requireAuth, async (req: CustomeRequest, res: Response, next: NextFunction) =>{
     try
     {
-        if (!req.user) throw new UnauthorizedError('You must be signed in to perform this action');
+        if (!req.user) {
+            throw new UnauthorizedError("You must be logged in to delete pets", 304)
+        }
+
+        let hasCred = false;
+
+        if (req.user.id === req.body.userId || req.user.role === 'Admin' || req.user.role === 'KPA Staff' || req.user.role === 'KPA Volunteer' || req.user.shelterId === req.body.shelterId) {
+            hasCred = true;
+        }
+
         let userId = req.user.id;
         let petId: string | number = req.params.petId;
-        if (!petId) throw new Error('Please pass in a valid shelter id');
+        if (!petId) throw new Error('No pet Id found');
 
         petId = Number(petId);
         let pet = await Pet.findByPk(petId);
-        if (!pet) throw new NoResourceError("Petable pet couldn't be found", 404);
-        let petJSON = await pet.toJSON();
-        if (petJSON.userId !== userId) throw new ForbiddenError('Forbidden: This is not your petable pet!');
+        if (!pet) throw new NoResourceError("Pet couldn't be found", 404);
+        if (!hasCred) throw new ForbiddenError(`Forbidden! You don't have the credentials to delete this pet`, 304);
         pet.destroy();
         return res.json(pet);
     } catch (e)

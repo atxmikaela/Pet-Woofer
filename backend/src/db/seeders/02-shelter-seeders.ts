@@ -14,7 +14,6 @@ module.exports = {
     options.tableName = 'Shelters';
     return queryInterface.bulkInsert(options, [
       {
-        id: 1,
         name: "Kerrville Pets Alive!",
         address: "2102 Memorial Blvd",
         city: "Kerrville",
@@ -30,7 +29,6 @@ module.exports = {
       },
 
       {
-        id: 2,
         name: "Animal Welfare Society of Kerr County (Freeman-Fritts)",
         address: "515 Spur 100",
         city: "Kerrville",
@@ -46,7 +44,6 @@ module.exports = {
       },
 
       {
-        id: 3,
         name: "Kathleen C. Cailloux Humane Society of Kerrville",
         address: "2900 Junction Highway",
         city: "Kerrville",
@@ -62,7 +59,6 @@ module.exports = {
       },
 
       {
-        id: 4,
         name: "Kerr County Animal Services",
         address: "3600 Loop 534",
         city: "Kerrville",
@@ -78,7 +74,6 @@ module.exports = {
       },
 
       {
-        id: 5,
         name: "Texas Round Up Animal Alliance (TRUAA)",
         address: "530 McDonald Loop",
         city: "Center Point",
@@ -94,7 +89,6 @@ module.exports = {
       },
 
       {
-        id: 6,
         name: "Buck Wild Rescue & Wildlife Rehabilitation",
         address: "285 Lazy Creek Road",
         city: "Ingram",
@@ -110,7 +104,6 @@ module.exports = {
       },
 
       {
-        id: 7,
         name: "Hill Country SPCA",
         address: "2981 S State Hwy 16",
         city: "Fredericksburg",

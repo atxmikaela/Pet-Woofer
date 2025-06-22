@@ -11,6 +11,17 @@ const theme = createTheme( {
   cssVariables: {
     colorSchemeSelector: 'data',
   },
+  components: {
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          maxWidth: '1200px !important',
+          margin: '0 auto',
+          padding: '0 20px',
+        },
+      },
+    },
+  },
 } );
 
 export default function Layout (): JSX.Element

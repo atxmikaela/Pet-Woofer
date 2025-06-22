@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 const router = require('express').Router();
 
+import uploadsRouter from './api/uploads';
 import apiRouter from './api'
 
 
+router.use('/uploads', uploadsRouter);
 router.use('/api', apiRouter);
 
 router.get("/api/csrf/restore", (req: Request, res: Response, next: NextFunction) => {
