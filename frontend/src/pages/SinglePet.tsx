@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import { useNavigate, useParams } from "react-router-dom";
-import { deletePetThunk, getPetsThunk, updatePetThunk } from "../redux/pets";
+import { deletePetImageThunk, deletePetThunk, getPetsThunk, updatePetThunk,	uploadPetImagesThunk} from '../redux/pets';
 import * as React from 'react';
-import {thunkAuthenticate} from "../redux/session";
-import {deleteImageThunk, uploadMultiplePetImagesThunk} from "../redux/images";
-
 
 
 const SinglePet: React.FC = () => {
@@ -20,84 +17,94 @@ const SinglePet: React.FC = () => {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const [hasCred, setHasCred] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
-	const [images, setImages] = useState<File[]>([]);
+	const [isUpdated, setIsUpdated] = useState<boolean>(false);
 	const [imageErrors, setImageErrors] = useState<string[]>([]);
-	const [isUploadingImages, setIsUploadingImages] = useState<boolean>(false);
-
+	
 
     const [formData, setFormData] = useState({
-        name: '',
-        species: '',
-        breed: '',
-        age: '',
-        gender: '',
-        size: '',
-        fee: '',
-        status: '',
-        description: '',
-        shelterId: '',
-        expireDate: '',
-        lastSeenDate: '',
-        lastSeenLocation: '',
-        color: '',
-    })
+			name: '',
+			species: '',
+			breed: '',
+			age: '',
+			gender: '',
+			size: '',
+			fee: '',
+			status: '',
+			description: '',
+			shelterId: '',
+			expireDate: '',
+			lastSeenDate: '',
+			lastSeenLocation: '',
+			color: '',
+			images: [] as File[],
+		});
 
     useEffect(() => {
         if (pet) {
             setFormData({
-                name: pet.name || '',
-                species: pet.species || '',
-                breed: pet.breed || '',
-                age: pet.age || '',
-                gender: pet.gender || '',
-                size: pet.size || '',
-                fee: pet.fee || '',
-                status: pet.status || '',
-                description: pet.description || '',
-                shelterId: pet.shelterId || '',
-                expireDate: pet.expireDate || '',
-                lastSeenDate: pet.lastSeenDate || '',
-                lastSeenLocation: pet.lastSeenLocation || '',
-                color: pet.color || '',
-            });
+				name: pet.name || '',
+				species: pet.species || '',
+				breed: pet.breed || '',
+				age: pet.age || '',
+				gender: pet.gender || '',
+				size: pet.size || '',
+				fee: pet.fee || '',
+				status: pet.status || '',
+				description: pet.description || '',
+				shelterId: pet.shelterId || '',
+				expireDate: pet.expireDate || '',
+				lastSeenDate: pet.lastSeenDate || '',
+				lastSeenLocation: pet.lastSeenLocation || '',
+				color: pet.color || '',
+				images: [],
+			});
         }
     }, [pet]);
 
     
 
-    useEffect(() => {
+	useEffect(() => {
+		const shouldFetch = !pet || Object.keys(pet).length === 0 || isUpdated;
 
-        if (!pet || Object.keys(pet).length === 0 || !pet.images) {
-        const getAdopts = async () => {
-             await dispatch(getPetsThunk())
-             await dispatch(thunkAuthenticate())
-             setIsLoaded(true)
-        };
-        getAdopts();
-    } else {
+		if (shouldFetch) {
+			const getAdopts = async () => {
+				setIsLoaded(false); 
+				await dispatch(getPetsThunk());
+				setIsLoaded(true);
+				setIsUpdated(false);
+			};
+			getAdopts();
+		} else {
+			setIsLoaded(true);
+		}
+	}, [dispatch, pet, isUpdated]);
+
+	useEffect(() => {
 		if (
-			user &&
-			(
-				user.id === pet?.userId ||
+			user && 
+			user?.role !== 'Public' &&  
+			(user.id === pet?.userId ||
 				user?.role === 'Admin' ||
 				user?.role === 'KPA Staff' ||
 				user?.role === 'KPA Volunteer' ||
-				user?.shelterId === pet?.shelterId
-			)
+				user?.shelterId === pet?.shelterId)
 		) {
 			setHasCred(true);
+		} else {
+			setHasCred(false);
 		}
-		setIsLoaded(true);
-	}
-	}, [dispatch, pet, user])
+	}, [user, pet]);
 
  
 
-		const handleUpdate = async (e: React.FormEvent) => {
-			e.preventDefault();
+	const handleUpdate = async (e: React.FormEvent) => {
+		e.preventDefault();
+
+		try {
+			const { images, ...petUpdateData } = formData;
 
 			const updateData = {
-				...formData,
+				...petUpdateData,
 				fee: formData.fee ? Number(formData.fee) : 0,
 				shelterId: formData.shelterId ? Number(formData.shelterId) : undefined,
 				expireDate: formData.expireDate ? new Date(formData.expireDate) : null,
@@ -106,17 +113,27 @@ const SinglePet: React.FC = () => {
 					: null,
 			};
 
-			try {
-				const res = await dispatch(updatePetThunk(pet.id, updateData));
-				setIsEditing(false);
-				if (res && !res.errors) {
-					setIsEditing(false);
+			const res = await dispatch(updatePetThunk(pet.id, updateData));
+
+			if (formData.images && formData.images.length > 0) {
+				const imageUploadRes = await dispatch(
+					uploadPetImagesThunk(pet.id, formData.images),
+				);
+
+				if (imageUploadRes && imageUploadRes.errors) {
+					setImageErrors(['Failed to upload some images']);
 				}
-			} catch (error) {
-				console.error('Update failed: ', error);
 			}
-		};
-	
+
+			if (res && !res.errors) {
+				setIsEditing(false);
+				setIsUpdated(true);
+			}
+		} catch (error) {
+			console.error('Update failed: ', error);
+			setImageErrors(['Failed to update pet']);
+		}
+	};
 
 
     const handleCancel = () => {
@@ -136,334 +153,409 @@ const SinglePet: React.FC = () => {
                 lastSeenDate: pet.lastSeenDate || '',
                 lastSeenLocation: pet.lastSeenLocation || '',
                 color: pet.color || '',
+				images: pet.images || [],
             });
         }
         setIsEditing(false);
-        
     }
 
-	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = Array.from(e.target.files || []);
-		setImages(files);
+
+		if (files.length > 10) {
+			setImageErrors(['Upload up to 10 images for this pet!']);
+			return;
+		}
+
+		const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+		const maxSize = 5 * 1024 * 1024;
+		const errors: string[] = [];
+
+		files.forEach((file, idx) => {
+			if (!validTypes.includes(file.type)) {
+				errors.push(
+					`Image ${idx + 1}: Only JPEG, PNG, and GIF please`,
+				);
+			}
+			if (file.size > maxSize) {
+				errors.push(`Image ${idx + 1}: File size must be less than 5MB`);
+			}
+		});
+
+		if (errors.length > 0) {
+			setImageErrors(errors);
+			return;
+		}
+
+		setFormData((prev) => ({ ...prev, images: files }));
 		setImageErrors([]);
 	};
 
-	const handleImageUpload = async () => {
-		if (images.length === 0) return;
-
-		setIsUploadingImages(true);
-
-		try {
-			const res = await dispatch(uploadMultiplePetImagesThunk(pet.id, images));
-
-			if (res && res.petImages) {
-				const updatedPet = {
-					...pet,
-					images: [...(pet.images || []), ...res.petImages]
-				};
-				dispatch(updatePetThunk(pet.id, updatedPet))
+	const handleDeleteImage = async (imageId: number) => {
+		if (window.confirm('Are you sure you want to delete this image?')) {
+			try {
+				const res = await dispatch(deletePetImageThunk(imageId));
+				if (res && res.success) {
+					setIsUpdated(true); 
+				}
+			} catch (error) {
+				console.error('Failed to delete image:', error);
+				setImageErrors(['Failed to delete image']);
 			}
-
-			setImages([]);
-		} catch (error) {
-			setImageErrors(['Failed to upload images']);
-		} finally {
-			setIsUploadingImages(false);
-			setIsEditing(false);
 		}
 	};
 
-	const handleDeleteImage = async (imageId: number) =>{
-		try {
-			const res = await dispatch(deleteImageThunk(imageId));
-
-			if (res && res.petImages) {
-				const updatedPet = {
-					...pet,
-					images: [...(pet.images || []), ...res.petImages]
-				};
-				dispatch(updatePetThunk(pet.id, updatedPet))
-				
-			}
-			setImages([]);
-		} catch (error) {
-			setImageErrors(['Failed to delete images']);
-		} finally {
-			dispatch(getPetsThunk())
-		
-		};
-	}
 
 	const handleDeletePet = async () => {
 			if (window.confirm(`Whoa There! Are you sure you want to delete ${pet.name}?`)){
 				try {
-					await dispatch(deletePetThunk(pet.id, pet));
+					await dispatch(deletePetThunk(pet.id));
 					navigate('/');
 				} catch (error) {
 					console.error(`Failed to delete ${pet.name}`, error);
 				}
 			}
 		};
+		const eDate = pet.expireDate ? new Date(pet.expireDate).toDateString(): null;
+
+		if (!isLoaded) return <h1>Your pets are on the way!</h1>;
+		if (!pet) return <h1>Pet not found!</h1>;
 	
-
-    if (!isLoaded || !pet) return <h1>Your pets are on the way!</h1>
-
     return (
-			<>
-				<h1>Single Pet Page</h1>
+			<div className='page-wrapper'>
+				<div className='single-wrapper'>
+					<h1>{pet.name} is {pet.status}</h1>
+					{pet.expireDate && (
+					<h2>{pet.name} is likely to be euthanized on {eDate}</h2>
+					)}
 
-				{isEditing && hasCred ?  (
-					<>
-						<form onSubmit={handleUpdate}>
-							<label>
-								Name
-								<input
-									type='text'
-									value={formData.name}
-									onChange={(e) =>
-										setFormData((prev) => ({ ...prev, name: e.target.value }))
-									}
-								/>
-							</label>
-							<label>
-								Species
-								<input
-									type='text'
-									value={formData.species}
-									onChange={(e) =>
-										setFormData((prev) => ({
-											...prev,
-											species: e.target.value,
-										}))
-									}
-								/>
-							</label>
-							<label>
-								Breed
-								<input
-									type='text'
-									value={formData.breed}
-									onChange={(e) =>
-										setFormData((prev) => ({ ...prev, breed: e.target.value }))
-									}
-								/>
-							</label>
-							<label>
-								Age
-								<input
-									type='text'
-									value={formData.age}
-									onChange={(e) =>
-										setFormData((prev) => ({ ...prev, age: e.target.value }))
-									}
-								/>
-							</label>
-							<label>
-								Gender
-								<input
-									type='text'
-									value={formData.gender}
-									onChange={(e) =>
-										setFormData((prev) => ({ ...prev, gender: e.target.value }))
-									}
-								/>
-							</label>
-							<label>
-								Fee
-								<input
-									type='text'
-									value={formData.fee}
-									onChange={(e) =>
-										setFormData((prev) => ({ ...prev, fee: e.target.value }))
-									}
-								/>
-							</label>
-							<label>
-								Status
-								<input
-									type='text'
-									value={formData.status}
-									onChange={(e) =>
-										setFormData((prev) => ({ ...prev, status: e.target.value }))
-									}
-								/>
-							</label>
-							<label>
-								Description
-								<input
-									type='text'
-									value={formData.description}
-									onChange={(e) =>
-										setFormData((prev) => ({
-											...prev,
-											description: e.target.value,
-										}))
-									}
-								/>
-							</label>
-							<label>
-								Shelter Id
-								<input
-									type='text'
-									value={formData.shelterId}
-									onChange={(e) =>
-										setFormData((prev) => ({
-											...prev,
-											shelterId: e.target.value,
-										}))
-									}
-								/>
-							</label>
-							<label>
-								Expire Date
-								<input
-									type='date'
-									value={formData.expireDate}
-									onChange={(e) =>
-										setFormData((prev) => ({
-											...prev,
-											expireDate: e.target.value,
-										}))
-									}
-								/>
-							</label>
-							<label>
-								Last Seen Date
-								<input
-									type='date'
-									value={formData.lastSeenDate}
-									onChange={(e) =>
-										setFormData((prev) => ({
-											...prev,
-											lastSeenDate: e.target.value,
-										}))
-									}
-								/>
-							</label>
-							<label>
-								Last Seen Location
-								<input
-									type='text'
-									value={formData.lastSeenLocation}
-									onChange={(e) =>
-										setFormData((prev) => ({
-											...prev,
-											lastSeenLocation: e.target.value,
-										}))
-									}
-								/>
-							</label>
-							<label>
-								Color
-								<input
-									type='text'
-									value={formData.color}
-									onChange={(e) =>
-										setFormData((prev) => ({ ...prev, color: e.target.value }))
-									}
-								/>
-							</label>
-							<button type='submit'>Update {pet.name}</button>
-							<button type='button' onClick={handleCancel}>
-								Cancel
-							</button>
-							<input
-								type='file'
-								multiple
-								accept='image/jpeg,image/jpg,image/png,image/gif'
-								onChange={handleImageChange}
-							/>
-							<button
-								onClick={handleImageUpload}
-								disabled={images.length === 0 || isUploadingImages}>
-								{isUploadingImages ? 'Uploading . . .' : 'Upload Images'}
-							</button>
-							{imageErrors.map((error, idx) => (
-								<p key={idx}>{error}</p>
-							))}
-						</form>
-					</>
-				) : (
-					<>
-						{pet?.images &&
-							pet.images.length > 0 &&
-							pet.images.map((image: { id: number; url: string }, idx: number) => (
-								<div key={idx}>
-									<img 
-										src={image.url}
-										height='300px'
-										alt={pet.name || 'Pet image'}
+					{isEditing && hasCred ? (
+						<>
+							<form onSubmit={handleUpdate}>
+								<label>
+									Name
+									<input
+										type='text'
+										value={formData.name}
+										onChange={(e) =>
+											setFormData((prev) => ({ ...prev, name: e.target.value }))
+										}
 									/>
-									{hasCred && (
-										<button onClick={() => handleDeleteImage(image.id)}>
-											Delete
-										</button>
-									)}
+								</label>
+								<label>
+									Species
+									<input
+										type='text'
+										value={formData.species}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												species: e.target.value,
+											}))
+										}
+									/>
+								</label>
+								<label>
+									Breed
+									<input
+										type='text'
+										value={formData.breed}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												breed: e.target.value,
+											}))
+										}
+									/>
+								</label>
+								<label>
+									Age
+									<input
+										type='text'
+										value={formData.age}
+										onChange={(e) =>
+											setFormData((prev) => ({ ...prev, age: e.target.value }))
+										}
+									/>
+								</label>
+								<label>
+									Gender
+									<input
+										type='text'
+										value={formData.gender}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												gender: e.target.value,
+											}))
+										}
+									/>
+								</label>
+								<label>
+									Fee
+									<input
+										type='text'
+										value={formData.fee}
+										onChange={(e) =>
+											setFormData((prev) => ({ ...prev, fee: e.target.value }))
+										}
+									/>
+								</label>
+								<label>
+									Status
+									<input
+										type='text'
+										value={formData.status}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												status: e.target.value,
+											}))
+										}
+									/>
+								</label>
+								<label>
+									Description
+									<input
+										type='text'
+										value={formData.description}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												description: e.target.value,
+											}))
+										}
+									/>
+								</label>
+								<label>
+									Shelter Id
+									<input
+										type='text'
+										value={formData.shelterId}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												shelterId: e.target.value,
+											}))
+										}
+									/>
+								</label>
+								<label>
+									Expire Date
+									<input
+										type='date'
+										value={formData.expireDate}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												expireDate: e.target.value,
+											}))
+										}
+									/>
+								</label>
+								<label>
+									Last Seen Date
+									<input
+										type='date'
+										value={formData.lastSeenDate}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												lastSeenDate: e.target.value,
+											}))
+										}
+									/>
+								</label>
+								<label>
+									Last Seen Location
+									<input
+										type='text'
+										value={formData.lastSeenLocation}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												lastSeenLocation: e.target.value,
+											}))
+										}
+									/>
+								</label>
+								<label>
+									Color
+									<input
+										type='text'
+										value={formData.color}
+										onChange={(e) =>
+											setFormData((prev) => ({
+												...prev,
+												color: e.target.value,
+											}))
+										}
+									/>
+								</label>
+								<label>
+									<input
+										type='file'
+										multiple
+										accept='image/jpeg,image/jpg,image/png,image/gif'
+										onChange={handleFileChange}
+									/>
+								</label>
+								{imageErrors.length > 0 && (
+									<div style={{ color: 'red' }}>
+										<ul>
+											{imageErrors.map((err, idx) => (
+												<li key={idx}>{err}</li>
+											))}
+										</ul>
+									</div>
+								)}
+
+								{pet?.images && pet.images.length > 0 ? (
+									<div>
+										<h3>
+											Due to staffing resources, we cannot guarantee that the
+											animal in the photos is the actual animal
+										</h3>
+										<div className='single-left-column'>
+											{pet.images.map((image: any, idx: number) => (
+												<div key={image.id || idx}>
+													<img src={image.url} alt={`${pet.name} ${idx + 1}`} />
+													{image.preview && <p>Preview Image</p>}
+													{hasCred && (
+														<button onClick={() => handleDeleteImage(image.id)}>
+															Delete
+														</button>
+													)}
+												</div>
+											))}
+										</div>
+									</div>
+								) : (
+									<div>
+										<h3>
+											Due to staffing resources, we cannot guarantee that the
+											animal in the photos is the actual animal
+										</h3>
+										<p>No images available for {pet.name}</p>
+									</div>
+								)}
+								<button type='submit' disabled={false}>
+									Photos: Update {pet.name}
+								</button>
+								<button type='button' onClick={handleCancel}>
+									Cancel
+								</button>
+							</form>
+						</>
+					) : (
+						<>
+							{hasCred && (
+								<>
+									<p>
+										Only logged in users with credentials can see this section.
+									</p>
+									<button onClick={() => setIsEditing(true)}>
+										Edit {pet.name}?
+									</button>
+									<button onClick={handleDeletePet}>Delete {pet.name}?</button>
+								</>
+							)}
+
+							{pet?.images && pet.images.length > 0 ? (
+								<div>
+									<p style={{ fontWeight: 200 }}>
+										Disclaimer: Ever since Jodie got hit with a lawn jart in her
+										eye last summer at the company barbecue, we cannot guarantee
+										that the images are the actual animal.
+									</p>
+									<div className='single-images-wrapper'>
+										{pet.images.map((image: any, idx: number) => (
+											<div
+												key={image.id || idx}
+												style={{ textAlign: 'center' }}>
+												<img src={image.url} alt={`${pet.name} ${idx + 1}`} />
+												{image.preview}
+											</div>
+										))}
+										<div></div>
+									</div>
 								</div>
-							))}
+							) : null}
 
-						{hasCred && (
-							<>
-							<p>Only logged in users with credentials can see this section.</p>
-							<button onClick={() => setIsEditing(true)}>Edit {pet.name}'s Information</button>
-							<button onClick={handleDeletePet}>Delete {pet.name}'s Profile?</button>
-							</>
-						)}
-						<p>Pet Id: {pet.userId} Shelter Id: {pet?.shelterId}</p>
-						<h2>Name: {pet.name}</h2>
-						<h2>Species: {pet.species}</h2>
-						<h2>Breed: {pet.breed}</h2>
-						<h2>Age: {pet.age}</h2>
-						<h2>Gender: {pet.gender}</h2>
-						<h2>Color: {pet.color}</h2>
-						<h2>Size: {pet.size}</h2>
-						<h2>Adoption Fee: ${pet.fee}</h2>
-						<h2>Status: {pet.status}</h2>
-						<h2>Description: {pet.description}</h2>
-
-						{pet.expireDate != null && (
-							<h2>
-								{pet.name} is likely to be euthanized on {pet.expireDate}
-							</h2>
-						)}
-
-						{pet.lastSeenDate != null && (
-							<h2>
-								{pet.name} was last seen on {pet.lastSeenDate}
-							</h2>
-						)}
-
-						{pet.lastSeenLocation != null && (
-							<h2>
-								{pet.name} was last seen at {pet.lastSeenLocation}
-							</h2>
-						)}
-
-						{pet?.shelter?.name != null && (
-							<>
+							<p>
+								Pet Id: {pet.userId} Shelter Id: {pet?.shelterId} for testing
+								purposes only
+							</p>
+							<div className='info-wrapper'>
+								<div className='west-coast-wrapper'></div>
 								<h2>
-									You can find {pet.name} at {pet.shelter.name}
+								Meet {pet.name}, a {pet.gender}, {pet.color}, {pet.breed} who
+								is {pet.age} old and is a {pet.size} {pet.species}.
 								</h2>
-								<h2>
-									{pet.shelter.address}, {pet.shelter.city}, {pet.shelter.state}{' '}
-									{pet.shelter.zip}
-								</h2>
-								<h2>Phone: {pet.shelter.phone}</h2>
-								<h2>
-									<a href={`mailto:${pet.shelter.email}`}>Email</a>{' '}
-									<a href={`${pet.shelter.website}`} target='new'>
-										Website
-									</a>
-								</h2>
-							</>
-						)}
-					</>
-				)}
-			</>
+
+								<h2>{pet.description}</h2>
+							</div>
+
+							{pet.status === 'available' && (
+								<>
+									<h2>
+										{pet.name} is {pet.status} to adopt for ${pet.fee} at{' '}
+										{pet.shelter.name}, located at {pet.shelter.address} in{' '}
+										{pet.shelter.city}, {pet.shelter.state}!
+									</h2>
+
+									<h2>
+										If you're interest in adopting {pet.name}, send an{' '}
+										<a href={`mailto:${pet.shelter.email}`}>email</a> or tap{' '}
+										<a href={`${pet.shelter.website}`} target='new'>
+											here
+										</a>{' '}
+										to call {pet.shelter.name} today.
+									</h2>
+								</>
+							)}
+
+							{pet.lastSeenDate != null && pet.status === 'missing' && (
+								<>
+									<h2>
+										{pet.name} was last seen at {pet.lastSeenLocation} on{' '}
+										{pet.lastSeenDate}
+									</h2>
+									<h2>
+										Contact Kerrville Pets Alive immediately if you see or find{' '}
+										{pet.name} at 830.200.0539
+									</h2>
+								</>
+							)}
+
+							{pet?.shelter?.name != null && (
+								<>
+									<div className='shelter-name-wrapper'>
+										<h1>{pet.shelter.name}</h1>
+									</div>
+									<div className='shelter-grid'>
+										<h2>
+											Address: {pet.shelter.address}, {pet.shelter.city},{' '}
+											{pet.shelter.state} {pet.shelter.zip}
+										</h2>
+
+										<h2>
+											<a href={`mailto:${pet.shelter.email}`}>Email</a> or visit{' '}
+											<a href={`${pet.shelter.website}`}>
+												{pet.shelter.website}
+											</a>
+										</h2>
+										<h2>{pet.shelter.description}</h2>
+									</div>
+								</>
+							)}
+						</>
+					)}
+				</div>
+			</div>
 		);
 }
-
-
 
 
 export default SinglePet;

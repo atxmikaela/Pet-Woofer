@@ -22,19 +22,17 @@ const isProduction = environment === 'production';
 
 router.use(restoreUser);
 
-router.use((req: any, res: any, next: any) => {
-    if (req.path.includes('/uploads') && (req.method === 'POST' || req.method === 'DELETE')) {
-        return next();
-    }
+
  
-    return csurf({
-        cookie: {
-            secure: isProduction,
-            sameSite: isProduction && "lax",
-            httpOnly: true
-        }
-    })(req, res, next);
-});
+    router.use(
+        csurf({
+            cookie: {
+                secure: isProduction,
+                sameSite: isProduction && "lax",
+                httpOnly: true
+            }
+        })
+    );
 
 
 router.use('/session', sessionRouter);

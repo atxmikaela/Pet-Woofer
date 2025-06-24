@@ -2,19 +2,19 @@ import { NextFunction, Request, Response } from "express";
 import { CustomeRequest } from "../../typings/express";
 import { validateQueryParams } from "../../utils/validation";
 import db from '../../db/models';
-import { Op } from 'sequelize';
 import { dateConverter } from "../../utils/date-conversion";
 import { GoodPet } from "../../typings/data";
 import { ForbiddenError, NoResourceError, UnauthorizedError } from "../../errors/customErrors";
-import {setTokenCookie} from "../../utils/auth";
 import { requireAuth } from "../../utils/auth";
+const {	multiplePublicFileUpload, multipleMulterUpload} = require('../../awsS3');
+
 
 
 const { Pet, Shelter, User } = db;
 const router = require('express').Router();
 
 
-// Get all petable pets
+// Get all pets
 
 router.get('/', validateQueryParams, async (req: Request, res: Response, next: NextFunction) => {
     try
@@ -35,25 +35,21 @@ router.get('/', validateQueryParams, async (req: Request, res: Response, next: N
         const petTransform = (pet: any) =>
         {
             const petJson = pet.toJSON();
-            // const { ...res } = petJson;
+          
             return {
                 ...petJson,
                 expireDate: petJson.expireDate,
                 createdAt: dateConverter(petJson.createdAt),
                 updatedAt: dateConverter(petJson.updatedAt)
-                // return res;
-            };
+           };
         };
 
-        const byId = pets.reduce((acc: any, pet: any) =>
-        {
+        const byId = pets.reduce((acc: any, pet: any) => {
             const transformed = petTransform(pet);
             acc[transformed.id] = transformed;
             return acc;
         }, {});
         // const allPets: any[] = [];
-
-
 
         res.status(200).json({ byId });
 
@@ -265,6 +261,40 @@ router.post('/', async (req: CustomeRequest, res: Response, next: NextFunction) 
 
 
 
+router.post('/images/:petId', multipleMulterUpload('image'), async (req: any, res: any, next: NextFunction) => {
+		try {
+			const petId = req.params.petId;
+
+			if (!req.files || req.files.length === 0) {
+				return res.status(400).json({ errors: ['No images uploaded'] });
+			}
+
+			const imageUrls = await multiplePublicFileUpload(req.files);
+
+			const petImages = await Promise.all(
+				imageUrls.map((url: string, index: number) =>
+					db.PetImage.create({
+						petId: Number(petId),
+						url: url,
+						preview: index === 0,
+					}),
+				),
+			);
+
+			return res.json({
+				success: true,
+				imageUrls,
+				petImages,
+			});
+		} catch (error: any) {
+			console.error('Image upload error:', error);
+			return res.status(500).json({
+				errors: [error.message || 'Failed to upload images'],
+			});
+		}
+	},
+);
+
 //update an pet
 
 router.put('/:petId', requireAuth, async (req: CustomeRequest, res: Response, next: NextFunction) =>
@@ -275,7 +305,7 @@ router.put('/:petId', requireAuth, async (req: CustomeRequest, res: Response, ne
         {
             let petId = req.params.petId;
 
-            if (!req.body) throw new NoResourceError('You must pass in a body to update an petable pet', 400);
+            if (!req.body) throw new NoResourceError('You must pass in a body to update a pet', 400);
 
             let { name, species, breed, age, gender, size, fee, status, description, userId, shelterId, color, expireDate, lastSeenLocation, lastSeenDate } = req.body;
 
@@ -403,7 +433,7 @@ router.delete('/:petId', requireAuth, async (req: CustomeRequest, res: Response,
             hasCred = true;
         }
 
-        let userId = req.user.id;
+
         let petId: string | number = req.params.petId;
         if (!petId) throw new Error('No pet Id found');
 
@@ -418,6 +448,29 @@ router.delete('/:petId', requireAuth, async (req: CustomeRequest, res: Response,
         return next(e);
     }
 });
+
+router.delete(
+	'/images/:imageId',
+	async (req: any, res: any, next: NextFunction) => {
+		try {
+			const imageId = req.params.imageId;
+
+			const image = await db.PetImage.findByPk(imageId);
+			if (!image) {
+				return res.status(404).json({ errors: ['Pet image not found'] });
+			}
+
+			await image.destroy();
+
+			return res.json({ success: true });
+		} catch (error: any) {
+			console.error('Image delete error:', error);
+			return res.status(500).json({
+				errors: [error.message || 'Failed to delete image'],
+			});
+		}
+	},
+);
 
 export = router;
 

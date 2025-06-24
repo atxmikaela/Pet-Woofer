@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/store";
-import { createPetThunk } from "../redux/pets";
 import * as React from 'react';
 import {thunkAuthenticate} from "../redux/session";
 import {useNavigate} from "react-router-dom";
-import {uploadMultiplePetImagesThunk} from "../redux/images";
+import { createPetThunk, uploadPetImagesThunk } from '../redux/pets';
 
 
 const CreatePet: React.FC = () => {
@@ -13,8 +12,6 @@ const CreatePet: React.FC = () => {
     const dispatch = useAppDispatch();
     const user = useAppSelector((store) => store.session.user);
     
-
-
     const [formData, setFormData] = useState({
         name: '',
         species: '',
@@ -58,12 +55,12 @@ const CreatePet: React.FC = () => {
         const maxSize = 5 * 1024 * 1024;
         const errors: string[] = [];
 
-        files.forEach((file, index) => {
+        files.forEach((file, idx) => {
             if (!validTypes.includes(file.type)) {
-                errors.push(`Image ${index + 1}: Only JPEG, PNG, and GIF files are allowed`);
+                errors.push(`Image ${idx + 1}: Only JPEG, PNG, and GIF files can be uploaded to Pet Woofer`);
             }
             if (file.size > maxSize) {
-                errors.push(`Image ${index + 1}: File size must be less than 5MB`);
+                errors.push(`Image ${idx + 1}: File size must be less than 5MB`);
             }
         });
 
@@ -103,7 +100,7 @@ const handleUpdate = async (e: React.FormEvent) => {
         
     if (petRes && !petRes.errors && petRes.id) {
         
-        const imageUploadRes = await dispatch(uploadMultiplePetImagesThunk(petRes.id, images));
+        const imageUploadRes = await dispatch(uploadPetImagesThunk(petRes.id, images));
 
 		if (imageUploadRes && !imageUploadRes.errors) {
 			navigate(`/pet/${petRes.id}`);
@@ -324,25 +321,25 @@ if (!user || user?.role === 'Public'){
                     {images.length > 0 && (
                         <div>
                         <h3>Selected Images ({images.length}/10):</h3>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-						{images.map((image, index) => (
-							<div key={index} style={{ textAlign: 'center'}}>
+                        <div>
+						{images.map((image, idx) => (
+							<div key={idx}>
 								<img
 								src={URL.createObjectURL(image)}
-								alt={`Preview ${index +1}`}
-								style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+								alt={`Preview ${idx +1}`}
+								
 />
-                                    <p style={{ fontSize: '12px' }}>{image.name}</p>
-                                    {index === 0 && <small>(Preview image)</small>}
+                                    <p>{image.name}</p>
+                                    {idx === 0}
                                 </div>
                             ))}
                         </div>
                     </div>
                 )}
                 {imageErrors.length > 0 && (
-                    <div style={{ color: 'red' }}>
-                        {imageErrors.map((error, index) => (
-                            <p key={index}>{error}</p>
+                    <div >
+                        {imageErrors.map((error, idx) => (
+                            <p key={idx}>{error}</p>
                         ))}
                     </div>
                 )}

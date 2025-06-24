@@ -31,18 +31,15 @@ function Navigation():JSX.Element {
 						<NavLink to='/pet/add'>Add a Pet</NavLink>
 					</li>
 				)}
-				<li onClick={() => navigate('/?filter=available')}>
-          Adoptable Pets
-          </li>
-				<li onClick={() => navigate('/?filter=missing')}>
-          Missing
-          </li>
-				<li onClick={() => navigate('/?filter=found')}>
-          Found
-          </li>
-				<li onClick={() => navigate('/?filter=shelters')}>
-          Shelters
-          </li>
+				{user && (user?.role === 'KPA Staff' || user?.role === 'Admin') && (
+					<li>
+						<NavLink to='/shelter/add'>Add a Shelter</NavLink>
+					</li>
+				)}
+				<li onClick={() => navigate('/?filter=available')}>Adoptable Pets</li>
+				<li onClick={() => navigate('/?filter=missing')}>Missing</li>
+				<li onClick={() => navigate('/?filter=found')}>Found</li>
+				<li onClick={() => navigate('/?filter=shelters')}>Shelters</li>
 			</ul>
 		</div>
 	);

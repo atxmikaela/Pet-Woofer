@@ -68,9 +68,12 @@ export const thunkLogin = (credentials: ICredentials): any => async (dispatch: a
       throw response;
     }
   } catch (e) {
-    const err = e as Response;
-    const errorMessages = await err.json();
-    return errorMessages;
+    console.error('Ugh: ', e);
+    return {
+      errors: {
+        message: 'Ugh'
+      }
+    }
   }
 
 };

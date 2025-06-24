@@ -21,11 +21,6 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: true,
         },
-        '/uploads': { 
-          target: "http://127.0.0.1:8099",
-          changeOrigin: true,
-          secure: true,
-        }
       }
     },
     optimizeDeps: {

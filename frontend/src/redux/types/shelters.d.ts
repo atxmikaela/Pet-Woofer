@@ -1,36 +1,35 @@
 import { Pet } from './pets';
 
 export interface IShelter {
-    id: number;
-    name: string;
-    address: string;
-    city: string;
-    state: string;
-    zip: string;
-    lat: number;
-    lon: number;
-    phone: string;
-    email: string;
-    website: string;
-    description: string;
-    userId: number;
-    createdAt: string;
-    updatedAt: string;
-    pets: { [id: number]: Pet };
+	id: number;
+	name: string;
+	address: string;
+	city: string;
+	state: string;
+	zip: string;
+	lat: number;
+	lon: number;
+	phone: string;
+	email: string;
+	website: string;
+	description: string;
+	userId: number;
+	createdAt: string;
+	updatedAt: string;
 }
 
-export interface IShelterState
-{
-    byId: {
-        [id: number]: IShelter;
-    },
+export interface IShelterById {
+	[id: number | string]: IShelter;
 }
 
-export interface IShelters {
-    byId: { [id: number]: IShelter };
+
+export interface IShelterState {
+	byId: {
+		[id: number | string]: IShelter;
+	};
 }
 
-export interface IShelterAction {
-    type: string;
-    payload: IShelters;
+export interface IActionCreator {
+	type: string;
+	payload: any;
 }

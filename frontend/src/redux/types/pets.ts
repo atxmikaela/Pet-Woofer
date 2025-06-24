@@ -23,6 +23,9 @@ export interface Pet
         color: string,
 }
 
+export interface IPetById {
+    [id: number | string]: Pet;
+}
 
 export interface IPetState
 {
@@ -35,6 +38,11 @@ export interface Pets
     {
         byId: { [id: number]: Pet };
     }
+
+    export interface IActionCreator {
+			type: string;
+			payload: any;
+		}
 
 
 

@@ -4,9 +4,13 @@
   right: 0;
   left: 0;
   bottom: 0;
-  display: flex;
+  max-width: 800px;
+  display: grid;
+  grid-template-columns: 1fr, 1fr;
+  margin: auto;
   justify-content: center;
   align-items: center;
+  
 }
 
 #modal-background {
@@ -15,10 +19,13 @@
   right: 0;
   left: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 #modal-content {
   position: absolute;
-  background-color:white;
+  background-color: rgba(99, 99, 99, 0.4);
+  color: #fff;
+  padding: 50px;
+  border-radius: 5px;
 }

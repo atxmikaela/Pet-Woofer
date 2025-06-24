@@ -6,6 +6,7 @@ import { Op } from 'sequelize';
 import { dateConverter } from "../../utils/date-conversion";
 import { GoodShelter } from "../../typings/data";
 import { ForbiddenError, NoResourceError, UnauthorizedError } from "../../errors/customErrors";
+import {requireAuth} from "../../utils/auth";
 
 
 const { Shelter, User } = db;
@@ -14,97 +15,34 @@ const router = require('express').Router();
 
 // Get all shelters
 
-router.get( '/', validateQueryParams, async (req: Request, res: Response, next: NextFunction) =>
-{
-    try
-    {
-        const shelters = await Shelter.findAll({
-            include: [
-                {
-                    model: db.Pets,
-                    as: 'pets',
-                    include: [
-                        {
-                            model: db.PetImage,
-                            as: 'images'
-                        }
-                    ]
-                }
-            ]
-        } );
+router.get('/', validateQueryParams, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const shelters = await Shelter.findAll();
 
-        const shelterTransform = shelters.map((shelter: any) =>
-        {
+        const shelterTransform = shelters.map((shelter: any) => {
             const shelterJson = shelter.toJSON();
-            const {pets, ...res} = shelterJson;
-
-            const petsById = pets ? pets.reduce( (acc: any, pet: any) =>
-            {
-                acc[ pet.id ] = {
-                    ...pet,
-                    createdAt: dateConverter(pet.createdAt),
-                    updatedAt: dateConverter(pet.updatedAt)
-                };
-                return res;
-            }, {} ) : {};
-
-                return {
-                    ...res,
-                    createdAt: dateConverter(res.createdAt),
-                    updatedAt: dateConverter(res.updatedAt),
-                    pets: petsById
-                };
+            return {
+                ...shelterJson,
+                createdAt: dateConverter(shelterJson.createdAt),
+                updatedAt: dateConverter(shelterJson.updatedAt)
+            };
         });
 
-        const byId = shelterTransform.reduce((acc: any, shelter: any) =>
-        {
-            acc[ shelter.id ] = shelter;
+        const byId = shelterTransform.reduce((acc: any, shelter: any) => {
+            acc[shelter.id] = shelter;
             return acc;
-        }, {} );
+        }, {});
+
         res.status(200);
-        res.json({
-            shelters: shelterTransform,
-        });
-    } catch (e)
-    {
+        res.json({ byId });
+    } catch (e) {
         return next(e);
     }
 });
 
 // Get all shelters owned by current user: 
 
-router.get('/:userId', async ( req: CustomeRequest, res: Response, next: NextFunction) =>
-{
-    try
-    {
-        const userId = req.params.userId;
-        const shelters = await Shelter.findAll({
-            where: {
-                userId: userId
-            },
-            include: [
-                {model: User, as: "Owner"}
-            ]
-        });
 
-        const shelterTransform = shelters.map(( shelter: any) =>
-        {
-            const shelterJson = shelter.toJSON();
-            const {Owner, ...res} = shelterJson;
-
-            res.ownerId = Owner.id;
-            res.createdAt = dateConverter(res.createdAt);
-            res.updatedAt = dateConverter(res.updatedAt);
-            return res;
-        } );
-
-        res.status(200);
-        res.json({ Shelters: shelterTransform });
-    } catch (e)
-    {
-        res.json({ message: e });
-    }
-});
 
 
 router.post('/', async (req: CustomeRequest, res: Response, next: NextFunction) =>
@@ -219,7 +157,7 @@ router.post('/', async (req: CustomeRequest, res: Response, next: NextFunction) 
 
 //update a shelter
 
-router.put('/:shelterId', async (req: CustomeRequest, res: Response, next: NextFunction) =>
+router.put('/:shelterId', requireAuth, async (req: CustomeRequest, res: Response, next: NextFunction) =>
 {
     try
     {
@@ -229,58 +167,75 @@ router.put('/:shelterId', async (req: CustomeRequest, res: Response, next: NextF
 
             if(!req.body) throw new NoResourceError('You must pass in a body to update a Shelter', 400);
 
-            let { newName, newPhone, newEmail, newWebsite, newAddress, newCity, newState, newZip } = req.body;
+            let { name, phone, email, website, address, city, state, zip } = req.body;
 
 
             const oldShelter = await Shelter.findByPk(shelterId);
             if(!oldShelter) throw new NoResourceError("Shelter couldn't be found, 404");
             let { ...response } = oldShelter.toJSON();
 
-            //User.id is questionable - should be userId?
-            if(response.userId !== oldShelter.userId)
+            if (!req.user) {
+							throw new UnauthorizedError(
+								'You must be logged in to edit shelters',
+								401,
+							);
+						}
+
+            let hasCred = false;
+
+						if (
+							req.user?.id === oldShelter.userId ||
+							req.user?.role === 'Admin' ||
+							req.user?.role === 'KPA Staff'
+														
+						) {
+							hasCred = true;
+						}
+           
+            if(!hasCred)
             {
                 throw new UnauthorizedError("You are not authorized to edit this shelter", 401);
             } else
             {
-                if(newName && response.name !== newName)
+                if(name && response.name !== name)
                 {
-                    oldShelter.name = newName;
-                    response.name = newName;
+                    oldShelter.name = name;
+                    response.name = name;
                 }
-                if(newPhone && response.phone !== newPhone)
+                if(phone && response.phone !== phone)
                 {
-                    oldShelter.phone = newPhone;
-                    response.phone = newPhone;
+                    oldShelter.phone = phone;
+                    response.phone = phone;
                 }
-                if(newEmail && response.email !== newEmail)
+                if(email && response.email !== email)
                 {
-                    oldShelter.email = newEmail;
-                    response.email = newEmail;
+                    oldShelter.email = email;
+                    response.email = email;
                 }
-                if(newWebsite && response.website !== newWebsite)
+                if(website && response.website !== website)
                 {
-                    oldShelter.website = newWebsite;
-                    response.website = newWebsite;
+                    oldShelter.website = website;
+                    response.website = website;
                 }
-                if(newAddress && response.address !== newAddress)
+                if(address && response.address !== address)
                 {
-                    oldShelter.address = newAddress;
-                    response.address = newAddress;
+                    oldShelter.address = address;
+                    response.address = address;
                 }
-                if(newCity && response.city !== newCity)
+                if(city && response.city !== city)
                 {
-                    oldShelter.city = newCity;
-                    response.city = newCity;
+                    oldShelter.city = city;
+                    response.city = city;
                 }
-                if(newState && response.state !== newState)
+                if(state && response.state !== state)
                 {
-                    oldShelter.state = newState;
-                    response.state = newState;
+                    oldShelter.state = state;
+                    response.state = state;
                 }
-                if(newZip && response.zip !== newZip)
+                if(zip && response.zip !== zip)
                 {
-                    oldShelter.zip = newZip;
-                    response.zip = newZip;
+                    oldShelter.zip = zip;
+                    response.zip = zip;
                 }
                 await oldShelter.save();
                 res.status(200);
@@ -293,7 +248,7 @@ router.put('/:shelterId', async (req: CustomeRequest, res: Response, next: NextF
         }
     } catch (error)
     {
-        return res.json({ message: error });
+        return next(error);
     }
 });
 
@@ -320,8 +275,17 @@ router.delete('/:shelterId', async (req: CustomeRequest, res: Response, next: Ne
 
         let shelterJSON = await shelter.toJSON();
 
-        if(shelterJSON.userId !== userId) throw new ForbiddenError('Forbidden: This is not your shelter');
+        let hasCred = false;
+				if (
+					req.user.id === shelterJSON.userId ||
+					req.user.role === 'Admin'
+				) {
+					hasCred = true;
+				}
 
+				if (!hasCred) {
+					throw new ForbiddenError('Forbidden: You cannot delete this shelter');
+				}
 
         shelter.destroy();
         return res.json(shelter);
