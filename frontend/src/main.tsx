@@ -8,6 +8,8 @@ import "./index.css";
 import store from "./redux/store";
 import { csrfFetch, restoreCSRF } from "./redux/csrf";
 
+
+
 declare global {
   interface Window {
     csrfFetch: any;

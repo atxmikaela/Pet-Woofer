@@ -6,6 +6,9 @@ export interface SessionInitialState {
 export interface IUser {
     id: number;
     email: string;
+    username: string;
+    role: string;
+    shelterId: number;
 }
 
 export interface ISignUpUser{

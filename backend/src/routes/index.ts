@@ -3,7 +3,6 @@ const router = require('express').Router();
 
 import apiRouter from './api'
 
-
 router.use('/api', apiRouter);
 
 router.get("/api/csrf/restore", (req: Request, res: Response, next: NextFunction) => {

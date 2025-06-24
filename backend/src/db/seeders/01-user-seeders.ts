@@ -27,6 +27,7 @@ module.exports = {
     email: "kpavolunteer@wolfer.com",
     username: "kpavolunteer",
     role: "KPA Volunteer",
+    shelterId: 1,
     hashedPassword: "$2a$10$RWA3t0FVaTYW1AOKNz5La.3jZDoe0RRqfZ3GFIIrmuNxnjHS0bxu6"
   },
   {
@@ -35,7 +36,7 @@ module.exports = {
     email: "sheltervolunteer@wolfer.com",
     username: "sheltervolunteer",
     role: "Shelter Volunteer",
-    shelterId: "1",
+    shelterId: 3,
     hashedPassword: "$2a$10$RWA3t0FVaTYW1AOKNz5La.3jZDoe0RRqfZ3GFIIrmuNxnjHS0bxu6"
   },
     {
@@ -52,7 +53,7 @@ module.exports = {
     email: "shelterstaff@wolfer.com",
     username: "shelterstaff",
     role: "Shelter Staff",
-    shelterId: "2",
+    shelterId: 2,
     hashedPassword: "$2a$10$RWA3t0FVaTYW1AOKNz5La.3jZDoe0RRqfZ3GFIIrmuNxnjHS0bxu6"
   },
     {

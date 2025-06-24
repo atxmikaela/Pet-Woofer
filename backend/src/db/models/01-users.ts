@@ -48,6 +48,17 @@ module.exports = (sequelize: any, DataTypes: any) => {
 
         static associate(models: any) {
             // Associations go here
+            User.hasMany(models.Pet, {
+                foreignKey: 'userId',
+                as: 'pets',
+                onDelete: 'CASCADE'
+            });
+
+            User.hasMany(models.Shelter, {
+                foreignKey: 'userId',
+                as: 'shelters',
+                onDelete: 'CASCADE'
+            });
         }
         // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 

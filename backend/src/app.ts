@@ -17,15 +17,35 @@ const app = express();
 
 app.use(morgan('dev'));
 app.use(cookieParser());
-app.use(express.json());
+
+// COMPLETELY BYPASS ALL PARSING FOR UPLOADS
+app.use('/uploads', (req, res, next) => {
+    console.log('=== UPLOADS ROUTE HIT ===');
+    next();
+});
+
+// Apply JSON and URL encoding to everything EXCEPT uploads
+app.use((req, res, next) => {
+    if (req.url.startsWith('/uploads')) {
+        console.log('SKIPPING PARSING FOR:', req.url);
+        return next();
+    }
+    console.log('APPLYING PARSING FOR:', req.url);
+    express.json({ limit: '50mb' })(req, res, next);
+});
+
+app.use((req, res, next) => {
+    if (req.url.startsWith('/uploads')) {
+        return next();
+    }
+    express.urlencoded({ extended: false, limit: '50mb' })(req, res, next);
+});
 
 // Security Middleware
 if (!isProduction) {
-    // enable cors only in development
     app.use(cors());
 }
 
-// helmet helps set a variety of headers to better secure your app
 app.use(
     helmet.crossOriginResourcePolicy({
         policy: "cross-origin"

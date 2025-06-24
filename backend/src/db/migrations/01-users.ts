@@ -35,8 +35,9 @@ module.exports = {
         unique: true
       },
       role: {
-        type: Sequelize.STRING(20),
+        type: Sequelize.ENUM('Public', 'KPA Volunteer', 'Shelter Volunteer', 'Shelter Staff', 'KPA Staff', 'Admin'),
         allowNull: false,
+        defaultValue: 'Public'
       },
       shelterId: {
         type: Sequelize.INTEGER,

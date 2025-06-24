@@ -20,15 +20,18 @@ export const thunkAuthenticate = (): any => async (dispatch: any) => {
     const response = await csrfFetch("/api/restore-user");
     if (response.ok) {
       const data = await response.json();
-      if (data.errors) {
+      if (data && data.errors) {
         throw response;
       }
+
+      if (data) {
       dispatch(setUser(data));
+      }
     } else {
       throw response;
     }
   } catch (e) {
-    console.log(e)
+    console.log('Auth error: ', e)
   }
 
 };
@@ -65,9 +68,12 @@ export const thunkLogin = (credentials: ICredentials): any => async (dispatch: a
       throw response;
     }
   } catch (e) {
-    const err = e as Response;
-    const errorMessages = await err.json();
-    return errorMessages;
+    console.error('Ugh: ', e);
+    return {
+      errors: {
+        message: 'Ugh'
+      }
+    }
   }
 
 };
@@ -119,9 +125,7 @@ export const thunkLogout = (): any => async (dispatch: any) => {
 const initialState: SessionInitialState = { user: null };
 
 function sessionReducer(state = initialState, action: IActionCreator): SessionInitialState {
-  let newState = {
-    ...state
-  };
+
 
   switch (action.type) {
     case SET_USER:

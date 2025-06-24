@@ -1,4 +1,3 @@
-import { text } from 'aws-sdk/clients/customerprofiles';
 import { Association, CreationOptional, DataTypes, Model, Optional } from 'sequelize';
 
 const { Validator } = require('sequelize');
@@ -15,7 +14,7 @@ type ShelterAttributes = {
     phone: string,
     email: string,
     website: string,
-    description: text,
+    description: string,
     userId: number,
 };
 
@@ -36,7 +35,7 @@ module.exports = (sequelize: any, DataTypes: any) => {
         declare phone: string;
         declare email: string;
         declare website: string;
-        declare description: text;
+        declare description: string;
         declare userId: number;
 
 
@@ -85,10 +84,10 @@ module.exports = (sequelize: any, DataTypes: any) => {
                 allowNull: false
             },
             lat: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.DECIMAL(10, 8),
             },
             lon: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.DECIMAL(10, 8),
             },
             phone: {
                 type: DataTypes.STRING,
