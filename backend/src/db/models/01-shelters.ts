@@ -42,8 +42,10 @@ module.exports = (sequelize: any, DataTypes: any) => {
         static associate(models: any) {
             // Associations go here
 
-        Shelter.belongsTo(models.User, { foreignKey: 'userId', as: 'Owner'});
-        }
+        
+        Shelter.hasMany(models.User, {foreignKey: 'userId' });
+        Shelter.hasMany(models.Pet, { foreignKey: 'petId' });
+    }
         // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 
 

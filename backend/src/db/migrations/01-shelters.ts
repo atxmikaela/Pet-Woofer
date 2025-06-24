@@ -58,13 +58,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.TEXT(500),    
       },
-      userId: {
-        type: Sequelize.INTEGER,
-         references: {
-          model: 'User',
-          key: 'id'
-        }
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -77,8 +70,6 @@ module.exports = {
       }
     }, options);
   },
-  down: async (queryInterface:any, Sequelize:any) => {
-    options.tableName = "Shelters";
-    return queryInterface.dropTable(options);
+  down: async (queryInterface:any, Sequelize:any) => {options.tableName = "Shelters"; return queryInterface.dropTable(options);
   }
 };

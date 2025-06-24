@@ -24,8 +24,8 @@
 		"fill-schema": "npx dotenv sequelize db:migrate && npx dotenv sequelize db:seed:all",
 		"build-db": "npx sequelize db:drop && npx sequelize db:create",
 		"db:production": "npx sequelize db:drop && npx sequelize db:create && npx sequelize db:migrate && npx sequelize db:seed:all",
-		"build-development": "rimraf ./dist && tsc",
-    "build-production": "npm run build && npm run db:migrate && npm run db:seed:all"
+		"build-development": "rimraf ./dist && tsc"
+
 	
 	},
 	"license": "ISC",
