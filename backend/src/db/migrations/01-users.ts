@@ -36,7 +36,6 @@ module.exports = {
       },
       role: {
         type: Sequelize.ENUM('Public', 'KPA Volunteer', 'Shelter Volunteer', 'Shelter Staff', 'KPA Staff', 'Admin'),
-        allowNull: false,
         defaultValue: 'Public'
       },
       shelterId: {

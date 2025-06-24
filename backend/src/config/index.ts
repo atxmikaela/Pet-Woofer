@@ -1,6 +1,6 @@
 export = {
     environment: process.env.NODE_ENV || 'development',
-    port: process.env.PORT || 8099,
+    port: process.env.PORT || 8000,
     // dbFile: process.env.DB_FILE,
     db: {
         username: process.env.DB_USERNAME,

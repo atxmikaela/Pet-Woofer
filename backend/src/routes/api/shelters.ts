@@ -76,6 +76,12 @@ router.post('/', async (req: CustomeRequest, res: Response, next: NextFunction) 
             userId
         } = req.body;
 
+        // Check if the user exists before creating shelter
+        const userExists = await User.findByPk(userId);
+        if (!userExists) {
+            throw new Error(`User with ID ${userId} does not exist. Cannot create shelter.`);
+        }
+
         // check to see if shelter exists with name, email, or phone number
         let shelter = await Shelter.findOne({where: {[Op.or]: [{name}, {email}, {phone}]}});
         if(shelter && name)

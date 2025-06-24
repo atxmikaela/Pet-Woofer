@@ -89,12 +89,12 @@ li {
         margin-right: 0px;
     }
     font-size: 20pt;
-    
     a {
         text-decoration: none;
         color: #fff;
         text-shadow: 2px 2px 4px var(--pet-gray);
     }
+    
 
     text-decoration: none;
     color: #fff;
@@ -102,6 +102,8 @@ li {
     
 
 }
+
+
 
 .profile-dropdown 
 position: absolute;
