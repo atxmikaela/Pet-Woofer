@@ -17,7 +17,7 @@ module.exports = {
 			[
 				{
 					firstName: 'Public',
-					lastName: 'User',
+					lastName: 'gser',
 					email: 'public@wolfer.com',
 					username: 'public',
 					role: 'Public',

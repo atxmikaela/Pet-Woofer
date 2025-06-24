@@ -21,7 +21,7 @@ module.exports = {
       petId: {
         type: Sequelize.INTEGER,
         references: {
-            model: 'Pets',
+            model: 'Pet',
             schema: 'id'
         },
         onUpdate: 'CASCADE',

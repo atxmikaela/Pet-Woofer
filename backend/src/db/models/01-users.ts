@@ -35,7 +35,7 @@ module.exports = (sequelize: any, DataTypes: any) => {
 
 
     async getSafeUser() {
-            return {
+            const safeUser = {
                 id: this.id,
                 email: this.email,
                 username: this.username,
@@ -43,22 +43,15 @@ module.exports = (sequelize: any, DataTypes: any) => {
                 lastName: this.lastName,
                 role: this.role,
             };
+            return safeUser
             
         }
 
         static associate(models: any) {
             // Associations go here
-            User.hasMany(models.Pet, {
-                foreignKey: 'userId',
-                as: 'pets',
-                onDelete: 'CASCADE'
-            });
+            User.hasMany(models.Pet, {foreignKey: 'userId', onDelete: 'cascade', hooks: true});
 
-            User.hasMany(models.Shelter, {
-                foreignKey: 'userId',
-                as: 'shelters',
-                onDelete: 'CASCADE'
-            });
+            User.hasMany(models.Shelter, {foreignKey: 'userId', onDelete: 'cascade', hooks: true});
         }
         // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 

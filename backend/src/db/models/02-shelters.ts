@@ -1,4 +1,4 @@
-import { Association, CreationOptional, DataTypes, Model, Optional } from 'sequelize';
+import { Association, CreationOptional, DataTypes, Model, Optional, type ForeignKey } from 'sequelize';
 
 const { Validator } = require('sequelize');
 
@@ -36,23 +36,16 @@ module.exports = (sequelize: any, DataTypes: any) => {
         declare email: string;
         declare website: string;
         declare description: string;
-        declare userId: number;
+        declare userId: ForeignKey<Shelter['id']>;
 
 
         static associate(models: any) {
             // Associations go here
 
-            Shelter.belongsTo(models.User, 
-                { 
-                    foreignKey: 'userId',
-                          as: 'Owner',
-                    onDelete: 'CASCADE' 
-                });
-          
+        Shelter.belongsTo(models.User, { foreignKey: 'userId', as: 'Owner'});
         }
         // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 
-            static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 
     }
     Shelter.init(
@@ -104,12 +97,14 @@ module.exports = (sequelize: any, DataTypes: any) => {
             },
             description: {
                 type: DataTypes.STRING(1000),
-                allowNull: false
+                
             },
             userId: {
                 type: DataTypes.INTEGER,
                     references: {
-                    model: 'Users',
+                    model: {
+                        tableName: 'Users',
+                    },
                     key: 'id'
                 }
             }
