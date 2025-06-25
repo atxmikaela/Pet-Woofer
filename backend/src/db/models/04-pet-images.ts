@@ -1,39 +1,28 @@
-import { Association, CreationOptional, DataTypes, Model, Optional, ForeignKey } from 'sequelize';
-
-
-
-const { Validator } = require('sequelize');
+import {CreationOptional, Model, Optional, ForeignKey} from 'sequelize';
 
 type PetImageAttributes = {
     id: number,
     petId: number,
     url: string,
-    preview: boolean;
-
+    preview: boolean
 };
 
-
-type PetImageCreationAttribute = Optional<
-    PetImageAttributes, 'id'>;
+type PetImageCreationAttributes = Optional<PetImageAttributes, 'id'>;
 
 module.exports = (sequelize: any, DataTypes: any) => {
-
-    class PetImage extends Model<PetImageAttributes, PetImageCreationAttribute>
-    {
+    class PetImage extends Model<PetImageAttributes, PetImageCreationAttributes> {
         declare id: CreationOptional<number>;
-        declare petId: ForeignKey<PetImage['id']>;
+        declare petId: ForeignKey<number>;
         declare url: string;
         declare preview: boolean;
 
-
-        static associate (models: any){
-            PetImage.belongsTo(models.Pet, { foreignKey: 'petId' });
+        static associate(models: any) {
+            PetImage.belongsTo(models.Pet, { foreignKey: 'petId', as: "Pet" });
         }
-
-        // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
-
     }
-    PetImage.init({
+
+    PetImage.init(
+        {
             id: {
                 type: DataTypes.INTEGER,
                 autoIncrement: true,
@@ -41,11 +30,7 @@ module.exports = (sequelize: any, DataTypes: any) => {
             },
             petId: {
                 type: DataTypes.INTEGER,
-                allowNull: false,
-                references: {
-                    model: 'Pets',
-                    key: 'id'
-                }
+                allowNull: false
             },
             url: {
                 type: DataTypes.STRING,
@@ -54,17 +39,19 @@ module.exports = (sequelize: any, DataTypes: any) => {
             preview: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
+                defaultValue: false
             }
-
-        },{
+        },
+        {
             sequelize,
             modelName: "PetImage",
+            timestamps: false,
             defaultScope: {
                 attributes: {
-                    exclude: ["createdAt", "updatedAt"]
+                    exclude: []
                 }
             },
         }
-   );
+    );
     return PetImage;
 };

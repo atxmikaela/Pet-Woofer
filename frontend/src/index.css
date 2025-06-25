@@ -29,11 +29,52 @@ body {
 }
 
 form {
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    max-width: 1000px;
+    align-items: center;
+}
 
+
+form div,
+.form-group,
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+form label {
+    min-width: 140px;
+    font-weight: 600;
+    white-space: nowrap;
+    
+}
+
+form input,
+form select,
+form textarea {
+    flex: 1;
+    padding: 8px 12px;
+    margin: 15px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--pet-gray);
+    border-radius: 4px;
 
 }
+
+form label textarea {
+    display: grid;
+    margin-top: 20px;
+
+    
+}
+
+
+
+
 
 input {
     padding: 5px;

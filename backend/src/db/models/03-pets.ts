@@ -1,147 +1,116 @@
-import { Association, CreationOptional, DataTypes, Model, Optional, type BelongsToGetAssociationMixin, type ForeignKey, type HasManyAddAssociationMixin, type HasManyCreateAssociationMixin, type HasManyGetAssociationsMixin } from 'sequelize';
-
-const { Validator } = require('sequelize');
+import {CreationOptional, Model, Optional, ForeignKey} from 'sequelize';
 
 type PetAttributes = {
     id: number,
     name: string,
     species: string,
     breed: string,
-    age: string,
-    description: string,
+    age: number,
     gender: string,
     size: string,
-    color?: string,
-    status: 'adopted' | 'missing' | 'found' | 'available' | 'protective custody' | 'not available' | 'expired',
-    expireDate?: Date | null;
-    lastSeenLocation?: string | null;
-    lastSeenDate?: Date | null;
+    color:string,
     fee: number,
-    shelterId?: number | null,
-    userId: number,
-    createdAt?: Date;
-    updatedAt?: Date;
+    description: string,
+
+    status: string,
+    shelterId: number | null,
+    userId: number | null,
+    lastSeenLocation: string,
+    lastSeenDate: Date,
+    expireDate: Date,
+    createdAt: Date,
+    updatedAt: Date,
 };
 
-type PetCreationAttributes = Optional<PetAttributes, 'id' | 'shelterId' | 'color' | 'expireDate' | 'lastSeenDate' | 'fee' | 'createdAt' | 'updatedAt'>;
+type PetCreationAttributes = Optional<PetAttributes, 'id' | 'createdAt' | 'updatedAt'>;
 
 module.exports = (sequelize: any, DataTypes: any) => {
-
-    class Pet extends Model<PetAttributes, PetCreationAttributes> implements PetAttributes {
-
-
-        declare id: number;
+    class Pet extends Model<PetAttributes, PetCreationAttributes> {
+        declare id: CreationOptional<number>;
         declare name: string;
         declare species: string;
         declare breed: string;
-        declare age: string;
-        declare description: string;
+        declare age: number;
         declare gender: string;
         declare size: string;
         declare color: string;
-        declare status: 'adopted' | 'missing' | 'found' | 'available' | 'protective custody' | 'not available' | 'expired';
-        declare expireDate: Date | null;
-        declare lastSeenLocation: string | null;
-        declare lastSeenDate: Date | null;
         declare fee: number;
- 
-        
-        declare userId: ForeignKey<number>;
-        declare shelterId: ForeignKey<number>;
-        
-        declare readonly createdAt: Date;
-        declare readonly updatedAt: Date;
+        declare description: string;
 
-        declare getOwner: BelongsToGetAssociationMixin<any>;
-        declare getShelter: BelongsToGetAssociationMixin<any>;
-        declare getImages: HasManyGetAssociationsMixin<any>;
-        declare addImage: HasManyAddAssociationMixin<any, number>;
-        declare createImage: HasManyCreateAssociationMixin<any>;
+        declare status: string;
+        declare shelterId: ForeignKey<number | null>;
+        declare userId: ForeignKey<number | null>;
+        declare lastSeenLocation: string;
+        declare lastSeenDate: Date;
+        declare expireDate: Date;
+        declare createdAt: CreationOptional<Date>;
+        declare updatedAt: CreationOptional<Date>;
 
         static associate(models: any) {
-            // Associations go here
-
-        Pet.belongsTo(models.User, {
-            foreignKey: 'userId',
-            as: 'owner'
-        });
-
-        Pet.belongsTo(models.Shelter, {
-            foreignKey: 'shelterId',
-            as: 'shelter',
-            constraints: false
-        });
-
-        Pet.hasMany(models.PetImage, {
-            foreignKey: 'petId',
-            as: 'images',
-            onDelete: 'CASCADE'
-        });
-
-        if (models.PetSighting) {
-            Pet.hasMany(models.petSighting, {
-                foreignKey: 'petId',
-                as: 'sightings',
-                onDelete: 'CASCADE'
-            });
+            Pet.belongsTo(models.Shelter, { foreignKey: 'shelterId', as: "shelter" });
+            Pet.belongsTo(models.User, { foreignKey: 'userId', as: "User" });
+            Pet.hasMany(models.PetImage, { foreignKey: 'petId', as: 'images', onDelete: 'cascade', hooks: true });
         }
-        }
-        // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
-
-            public static associations: { 
-                owner: Association<Pet, any>;
-                shelter: Association<Pet, any>;
-                images: Association<Pet, any>;
-                sightings?: Association<Pet, any>;
-            };
     }
-
 
     Pet.init(
         {
             id: {
                 type: DataTypes.INTEGER,
                 autoIncrement: true,
-                primaryKey: true,
-                allowNull: false
+                primaryKey: true
             },
             name: {
-                type: DataTypes.STRING(40),
+                type: DataTypes.STRING,
                 allowNull: false
             },
             species: {
-                type: DataTypes.STRING(20),
+                type: DataTypes.STRING,
                 allowNull: false
             },
             breed: {
-                type: DataTypes.STRING(40),
+                type: DataTypes.STRING,
                 allowNull: false
             },
             age: {
-                type: DataTypes.STRING(10),
-                allowNull: false
-            },
-            color: {
-                type: DataTypes.STRING(10),
+                type: DataTypes.INTEGER,
                 allowNull: false
             },
             gender: {
-                type: DataTypes.STRING(10),
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            fee: {
+                type: DataTypes.DECIMAL(10, 2),
+                allowNull: false
+            },
+            color: {
+                type: DataTypes.STRING,
                 allowNull: false
             },
             size: {
-                type: DataTypes.STRING(20),
+                type: DataTypes.STRING,
+                allowNull: false
             },
-            fee: {
-                type: DataTypes.INTEGER,
+            description: {
+                type: DataTypes.TEXT,
+                allowNull: true
             },
             status: {
-                type: DataTypes.ENUM( 'adopted', 'missing', 'found', 'available', 'protective custody', 'not available', 'expired'),
+                type: DataTypes.STRING,
                 allowNull: false,
-                defaultValue: 'not available'
+                defaultValue: 'available'
+            },
+            shelterId: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            },
+            userId: {
+                type: DataTypes.INTEGER,
+                allowNull: true
             },
             lastSeenLocation: {
-                type: DataTypes.STRING(255),
+                type: DataTypes.STRING,
                 allowNull: true
             },
             lastSeenDate: {
@@ -149,27 +118,17 @@ module.exports = (sequelize: any, DataTypes: any) => {
                 allowNull: true
             },
             expireDate: {
-                type: DataTypes.DATE
+                type: DataTypes.DATE,
+                allowNull: true
             },
-            description: {
-                type: DataTypes.TEXT,
+            createdAt: {
+                type: DataTypes.DATE,
                 allowNull: false
             },
-            shelterId: {
-                type: DataTypes.INTEGER,
-                references: {
-                    model: 'Shelters',
-                    key: 'id'
-                }
-            },
-            userId: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                references: {
-                    model: 'Users',
-                    key: 'id'
-                }
-            },
+            updatedAt: {
+                type: DataTypes.DATE,
+                allowNull: false
+            }
         },
         {
             sequelize,
@@ -180,6 +139,6 @@ module.exports = (sequelize: any, DataTypes: any) => {
                 }
             },
         }
-    )
+    );
     return Pet;
-}
+};

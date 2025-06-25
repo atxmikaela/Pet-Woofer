@@ -1,55 +1,43 @@
-import { Association, CreationOptional, DataTypes, Model, Optional, type ForeignKey } from 'sequelize';
-
-const { Validator } = require('sequelize');
+import {CreationOptional, Model, Optional} from 'sequelize';
 
 type ShelterAttributes = {
-    id: number,
+    id: string,
     name: string,
     address: string,
     city: string,
     state: string,
     zip: string,
-    lat: number,
-    lon: number,
     phone: string,
     email: string,
     website: string,
     description: string,
-    userId: number,
+    createdAt: Date,
+    updatedAt: Date,
 };
 
-type ShelterCreationAttributes = Optional<
-    ShelterAttributes, 'id'>;
+type ShelterCreationAttributes = Optional<ShelterAttributes, 'id' | 'createdAt' | 'updatedAt'>;
 
 module.exports = (sequelize: any, DataTypes: any) => {
-
     class Shelter extends Model<ShelterAttributes, ShelterCreationAttributes> {
-        declare id: CreationOptional<number>;
+        declare id: CreationOptional<string>;
         declare name: string;
         declare address: string;
         declare city: string;
         declare state: string;
         declare zip: string;
-        declare lat: number;
-        declare lon: number;
         declare phone: string;
         declare email: string;
         declare website: string;
         declare description: string;
-        declare userId: ForeignKey<Shelter['id']>;
-
+        declare createdAt: CreationOptional<Date>;
+        declare updatedAt: CreationOptional<Date>;
 
         static associate(models: any) {
-            // Associations go here
-
-        
-        Shelter.hasMany(models.User, {foreignKey: 'userId' });
-        Shelter.hasMany(models.Pet, { foreignKey: 'petId' });
+            Shelter.hasMany(models.User, { foreignKey: 'shelterId', onDelete: 'cascade', hooks: true });
+            Shelter.hasMany(models.Pet, { foreignKey: 'shelterId', onDelete: 'cascade', hooks: true });
+        }
     }
-        // declare public static associations: { [key: string]: Association<Model<any, any>, Model<any, any>>; };
 
-
-    }
     Shelter.init(
         {
             id: {
@@ -59,7 +47,6 @@ module.exports = (sequelize: any, DataTypes: any) => {
             },
             name: {
                 type: DataTypes.STRING,
-                unique: true,
                 allowNull: false
             },
             address: {
@@ -78,15 +65,8 @@ module.exports = (sequelize: any, DataTypes: any) => {
                 type: DataTypes.STRING,
                 allowNull: false
             },
-            lat: {
-                type: DataTypes.DECIMAL(10, 8),
-            },
-            lon: {
-                type: DataTypes.DECIMAL(10, 8),
-            },
             phone: {
                 type: DataTypes.STRING,
-                unique: true,
                 allowNull: false
             },
             email: {
@@ -95,20 +75,19 @@ module.exports = (sequelize: any, DataTypes: any) => {
             },
             website: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: true
             },
             description: {
-                type: DataTypes.STRING(1000),
-                
+                type: DataTypes.STRING,
+                allowNull: true
             },
-            userId: {
-                type: DataTypes.INTEGER,
-                    references: {
-                    model: {
-                        tableName: 'Users',
-                    },
-                    key: 'id'
-                }
+            createdAt: {
+                type: DataTypes.DATE,
+                allowNull: false
+            },
+            updatedAt: {
+                type: DataTypes.DATE,
+                allowNull: false
             }
         },
         {
@@ -120,6 +99,6 @@ module.exports = (sequelize: any, DataTypes: any) => {
                 }
             },
         }
-    )
+    );
     return Shelter;
-}
+};

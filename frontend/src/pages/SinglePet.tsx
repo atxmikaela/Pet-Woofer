@@ -64,9 +64,9 @@ const SinglePet: React.FC = () => {
     
 
 	useEffect(() => {
-		const shouldFetch = !pet || Object.keys(pet).length === 0 || isUpdated;
+		const shouldGet = !pet || Object.keys(pet).length === 0 || isUpdated;
 
-		if (shouldFetch) {
+		if (shouldGet) {
 			const getAdopts = async () => {
 				setIsLoaded(false); 
 				await dispatch(getPetsThunk());
@@ -163,8 +163,8 @@ const SinglePet: React.FC = () => {
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = Array.from(e.target.files || []);
 
-		if (files.length > 10) {
-			setImageErrors(['Upload up to 10 images for this pet!']);
+		if (files.length > 3) {
+			setImageErrors(['Upload up to 3 images for this pet!']);
 			return;
 		}
 
@@ -175,11 +175,11 @@ const SinglePet: React.FC = () => {
 		files.forEach((file, idx) => {
 			if (!validTypes.includes(file.type)) {
 				errors.push(
-					`Image ${idx + 1}: Only JPEG, PNG, and GIF please`,
+					`Image ${idx + 1}: Only JPEG, PNG, and GIF, MEOWS AND WOOFS please`,
 				);
 			}
 			if (file.size > maxSize) {
-				errors.push(`Image ${idx + 1}: File size must be less than 5MB`);
+				errors.push(`Image ${idx + 1}: Your photo size is larger than 5MB. Are you trying to upload a photo of an elephant?`);
 			}
 		});
 
@@ -193,7 +193,7 @@ const SinglePet: React.FC = () => {
 	};
 
 	const handleDeleteImage = async (imageId: number) => {
-		if (window.confirm('Are you sure you want to delete this image?')) {
+		if (window.confirm(`Are you sure you want to delete this cute image of ${pet.name}?`)) {
 			try {
 				const res = await dispatch(deletePetImageThunk(imageId));
 				if (res && res.success) {
@@ -225,9 +225,9 @@ const SinglePet: React.FC = () => {
     return (
 			<div className='page-wrapper'>
 				<div className='single-wrapper'>
-					<h1>{pet.name} is {pet.status}</h1>
-					{pet.expireDate && (
-					<h2>{pet.name} is likely to be euthanized on {eDate}</h2>
+					<h1>{pet?.name} is {pet?.status}</h1>
+					{pet?.expireDate && (
+					<h2>{pet?.name} is likely to be euthanized on {eDate}</h2>
 					)}
 
 					{isEditing && hasCred ? (
@@ -317,8 +317,9 @@ const SinglePet: React.FC = () => {
 								</label>
 								<label>
 									Description
-									<input
-										type='text'
+									<textarea
+					
+										
 										value={formData.description}
 										onChange={(e) =>
 											setFormData((prev) => ({
@@ -419,11 +420,11 @@ const SinglePet: React.FC = () => {
 										</h3>
 										<div className='single-left-column'>
 											{pet.images.map((image: any, idx: number) => (
-												<div key={image.id || idx}>
-													<img src={image.url} alt={`${pet.name} ${idx + 1}`} />
+												<div key={image?.id || idx}>
+													<img src={image?.url} alt={`${pet?.name} ${idx + 1}`} />
 													{image.preview && <p>Preview Image</p>}
 													{hasCred && (
-														<button onClick={() => handleDeleteImage(image.id)}>
+														<button onClick={() => handleDeleteImage(image?.id)}>
 															Delete
 														</button>
 													)}
@@ -437,11 +438,11 @@ const SinglePet: React.FC = () => {
 											Due to staffing resources, we cannot guarantee that the
 											animal in the photos is the actual animal
 										</h3>
-										<p>No images available for {pet.name}</p>
+										<p>No images available for {pet?.name}</p>
 									</div>
 								)}
 								<button type='submit' disabled={false}>
-									Photos: Update {pet.name}
+									Photos: Update {pet?.name}
 								</button>
 								<button type='button' onClick={handleCancel}>
 									Cancel
@@ -456,13 +457,13 @@ const SinglePet: React.FC = () => {
 										Only logged in users with credentials can see this section.
 									</p>
 									<button onClick={() => setIsEditing(true)}>
-										Edit {pet.name}?
+										Edit {pet?.name}?
 									</button>
-									<button onClick={handleDeletePet}>Delete {pet.name}?</button>
+									<button onClick={handleDeletePet}>Delete {pet?.name}?</button>
 								</>
 							)}
 
-							{pet?.images && pet.images.length > 0 ? (
+							{pet?.images && pet.images?.length > 0 ? (
 								<div>
 									<p style={{ fontWeight: 200 }}>
 										Disclaimer: Ever since Jodie got hit with a lawn jart in her
@@ -470,12 +471,12 @@ const SinglePet: React.FC = () => {
 										that the images are the actual animal.
 									</p>
 									<div className='single-images-wrapper'>
-										{pet.images.map((image: any, idx: number) => (
+										{pet.images?.map((image: any, idx: number) => (
 											<div
-												key={image.id || idx}
+												key={image?.id || idx}
 												style={{ textAlign: 'center' }}>
-												<img src={image.url} alt={`${pet.name} ${idx + 1}`} />
-												{image.preview}
+												<img src={image?.url} alt={`${pet?.name} ${idx + 1}`} />
+												{image?.preview}
 											</div>
 										))}
 										<div></div>
@@ -484,13 +485,13 @@ const SinglePet: React.FC = () => {
 							) : null}
 
 							<p>
-								Pet Id: {pet.userId} Shelter Id: {pet?.shelterId} for testing
+								Pet Id: {pet?.userId} Shelter Id: {pet?.shelterId} for testing
 								purposes only
 							</p>
 							<div className='info-wrapper'>
 								<div className='west-coast-wrapper'></div>
 								<h2>
-								Meet {pet.name}, a {pet.gender}, {pet.color}, {pet.breed} who
+								Meet {pet?.name}, a {pet.gender}, {pet.color}, {pet.breed} who
 								is {pet.age} old and is a {pet.size} {pet.species}.
 								</h2>
 
@@ -500,31 +501,31 @@ const SinglePet: React.FC = () => {
 							{pet.status === 'available' && (
 								<>
 									<h2>
-										{pet.name} is {pet.status} to adopt for ${pet.fee} at{' '}
-										{pet.shelter.name}, located at {pet.shelter.address} in{' '}
-										{pet.shelter.city}, {pet.shelter.state}!
+										{pet?.name} is {pet?.status} to adopt for ${pet?.fee} at{' '}
+										{pet.shelter?.name}, located at {pet.shelter?.address} in{' '}
+										{pet.shelter?.city}, {pet.shelter?.state}!
 									</h2>
 
 									<h2>
-										If you're interest in adopting {pet.name}, send an{' '}
-										<a href={`mailto:${pet.shelter.email}`}>email</a> or tap{' '}
-										<a href={`${pet.shelter.website}`} target='new'>
+										If you're interest in adopting {pet?.name}, send an{' '}
+										<a href={`mailto:${pet.shelter?.email}`}>email</a> or tap{' '}
+										<a href={`${pet.shelter?.website}`} target='new'>
 											here
 										</a>{' '}
-										to call {pet.shelter.name} today.
+										to call {pet.shelter?.name} today.
 									</h2>
 								</>
 							)}
 
-							{pet.lastSeenDate != null && pet.status === 'missing' && (
+							{pet?.lastSeenDate != null && pet?.status === 'missing' && (
 								<>
 									<h2>
-										{pet.name} was last seen at {pet.lastSeenLocation} on{' '}
-										{pet.lastSeenDate}
+										{pet?.name} was last seen at {pet?.lastSeenLocation} on{' '}
+										{pet?.lastSeenDate}
 									</h2>
 									<h2>
 										Contact Kerrville Pets Alive immediately if you see or find{' '}
-										{pet.name} at 830.200.0539
+										{pet?.name} at 830.200.0539
 									</h2>
 								</>
 							)}
@@ -536,17 +537,17 @@ const SinglePet: React.FC = () => {
 									</div>
 									<div className='shelter-grid'>
 										<h2>
-											Address: {pet.shelter.address}, {pet.shelter.city},{' '}
-											{pet.shelter.state} {pet.shelter.zip}
+											Address: {pet.shelter?.address}, {pet.shelter?.city},{' '}
+											{pet.shelter?.state} {pet.shelter?.zip}
 										</h2>
 
 										<h2>
-											<a href={`mailto:${pet.shelter.email}`}>Email</a> or visit{' '}
-											<a href={`${pet.shelter.website}`}>
-												{pet.shelter.website}
+											<a href={`mailto:${pet.shelter?.email}`}>Email</a> or visit{' '}
+											<a href={`${pet.shelter?.website}`}>
+												{pet.shelter?.website}
 											</a>
 										</h2>
-										<h2>{pet.shelter.description}</h2>
+										<h2>{pet.shelter?.description}</h2>
 									</div>
 								</>
 							)}

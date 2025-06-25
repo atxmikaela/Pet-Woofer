@@ -1,4 +1,5 @@
-"use strict";
+'use strict';
+
 
 import { OptionsInterface } from "../../typings/seeders";
 
@@ -8,8 +9,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 module.exports = {
-  up: async (queryInterface:any, Sequelize:any) => {
-    return queryInterface.createTable("Shelters", {
+  up: async (queryInterface: any, Sequelize: any) => {
+    await queryInterface.createTable('Shelters', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -17,46 +18,40 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       name: {
-        allowNull:false,
-        type: Sequelize.STRING(100)
-      },
-      address: {
-        allowNull:false,
-        type: Sequelize.STRING(100)
-      },
-      city: {
-        type: Sequelize.STRING(30),
-        allowNull: false,
-      },
-      state: {
-        type: Sequelize.STRING(2),
-        allowNull: false,
-      },
-      zip: {
-        type: Sequelize.STRING(5),
+        type: Sequelize.STRING,
         allowNull: false
       },
-      lat: {
-        type: Sequelize.DECIMAL(10, 8),
+      address: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
-      lon: {
-        type: Sequelize.DECIMAL(10, 8),
+      city: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      state: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      zip: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       phone: {
-        type: Sequelize.STRING(14),
+        type: Sequelize.STRING,
         allowNull: false
       },
       email: {
-        type: Sequelize.STRING(100),
-        allowNull: false,
+        type: Sequelize.STRING,
+        allowNull: false
       },
       website: {
-        type: Sequelize.STRING(100),
-        allowNull: false,
-      }, 
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       description: {
-        allowNull: false,
-        type: Sequelize.TEXT(500),    
+        type: Sequelize.TEXT,
+        allowNull: true
       },
       createdAt: {
         allowNull: false,
@@ -68,8 +63,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
-    }, options);
+    });
   },
-  down: async (queryInterface:any, Sequelize:any) => {options.tableName = "Shelters"; return queryInterface.dropTable(options);
+  down: async (queryInterface: any, Sequelize: any) => {
+        options.tableName = "Shelters"
+    await queryInterface.dropTable('options');
   }
 };

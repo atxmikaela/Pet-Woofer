@@ -1,21 +1,25 @@
 {
-  "name": "petwoofer",
-  "version": "1.0.0",
-  "description": "## Navigation > [API Docs](https://github.com/atxmikaela/petwoofer)",
-  "main": "index.js",
-  "scripts": {
-    "install": "npm --prefix backend install backend",
-    "dev:backend": "npm install --prefix backend start",
-    "sequelize": "npm run --prefix backend sequelize",
-    "sequelize-cli": "npm run --prefix backend sequelize-cli",
-    "start": "npm start --prefix backend",
-    "build": "npm run --prefix backend build-production"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "dotenv-cli": "^7.4.2"
-  }
+	"name": "petwoofer",
+	"version": "1.0.0",
+	"description": "## Navigation > [API Docs](https://github.com/atxmikaela/petwoofer)",
+	"main": "index.js",
+	"scripts": {
+		"install": "npm --prefix backend install backend",
+		"dev:backend": "npm install --prefix backend start",
+		"sequelize": "npm run --prefix backend sequelize",
+		"sequelize-cli": "npm run --prefix backend sequelize-cli",
+		"start": "npm start --prefix backend",
+		"build": "npm install --prefix frontend && npm run build --prefix frontend && npm run build --prefix backend",
+		"spin": "npm run clean && npm run build && docker build --no-cache -t mikaelataylor/w00fer:latest . && docker push mikaelataylor/w00fer:latest",
+		"spin-versioned": "npm run clean && npm run build && docker build --no-cache -t mikaelataylor/w00fer:v$(date +%s) . && docker push mikaelataylor/w00fer",
+    "clean": "rm -rf dist && rm -rf backend/dist",
+    "woodchipper": "npm run --prefix backend woodchipper"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"dotenv": "^16.4.5",
+		"dotenv-cli": "^7.4.2"
+	}
 }

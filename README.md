@@ -1,7 +1,15 @@
-# Typescript Skeleton (change name)
+# Pet Woofer
 
-## Navigation
+
 ## Overview
+
+Pet Woofer is an app created to help animal rescue organizations who operate over regions to communicate to the public which animals are available for adoption, lost, missing, or emergency situations such as being at risk of eathanasia. 
+
+The app is structured with a hierarchy of user type, with the main admin having complete control, the shelter staff being able to make most admin changes, and the main organizations volunteers able to add animals for all shelters. Local shelters can also have a different level of access allowing them to add or remove pets for their particular shelter. They are the admins of their shelter and can also add or remove volunteers. 
+
+This app uses an AWS "Bucket" to store its photos of pets and is written in mainly Typescript. It utilizes Postgres as it's database and Docker for production. This version also has a "DEMO' button set up on the production build that allows users with one tap to have full admin access of the build. 
+
+This is version 1.0 of Pet Woofer.
 
 
 ### Tech Stack:
@@ -25,11 +33,11 @@
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Shell Scripting](https://img.shields.io/badge/Shell_Script-121011?style=for-the-badge&logo=gnu-bash&logoColor=white)
-![SQLite3](https://img.shields.io/badge/SQLite3-00000F?style=for-the-badge&logo=sqlite3&logoColor=white)
 ![Amazon AWS](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
 ![Github Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 
-### Features
 
 #### Acknowledgments
+
+Anthony Bronca, Marlon Santos, Alexi Bettinger, Michael Wilcox, and the teachings of others from App Academy contributed to the creation of this app. 

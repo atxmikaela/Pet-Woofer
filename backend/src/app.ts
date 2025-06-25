@@ -18,33 +18,15 @@ const app = express();
 app.use(morgan('dev'));
 app.use(cookieParser());
 
-// COMPLETELY BYPASS ALL PARSING FOR UPLOADS
-app.use('/uploads', (req, res, next) => {
-    console.log('=== UPLOADS ROUTE HIT ===');
-    next();
-});
-
-// Apply JSON and URL encoding to everything EXCEPT uploads
-app.use((req, res, next) => {
-    if (req.url.startsWith('/uploads')) {
-        console.log('SKIPPING PARSING FOR:', req.url);
-        return next();
-    }
-    console.log('APPLYING PARSING FOR:', req.url);
-    express.json({ limit: '50mb' })(req, res, next);
-});
-
-app.use((req, res, next) => {
-    if (req.url.startsWith('/uploads')) {
-        return next();
-    }
-    express.urlencoded({ extended: false, limit: '50mb' })(req, res, next);
-});
+app.use(express.json());
 
 // Security Middleware
 if (!isProduction) {
+    // enable cors only in development
     app.use(cors());
 }
+
+// helmet helps set a variety of headers to better secure your app
 
 app.use(
     helmet.crossOriginResourcePolicy({
@@ -55,6 +37,17 @@ app.use(
 //apply middleware to allow for usage of static react-vite from build
 app.use(express.static(path.join(__dirname, "react-vite")));
 app.use(express.static(path.join(__dirname, 'react-vite/assets/favicon.ico')));
+
+// Set the _csrf token and create req.csrfToken method
+app.use(
+    csurf({
+        cookie: {
+            secure: isProduction,
+            sameSite: isProduction && "lax",
+            httpOnly: true
+        }
+    })
+);
 
 //api routes
 app.use(routes);
@@ -71,7 +64,7 @@ app.get('/favicon.ico', (_req, res, _next) => {
 app.get(/^(?!\/?api).*/, (req:Request, res:Response) => {
     res.cookie('XSRF-TOKEN', req.csrfToken());
     res.sendFile(
-        path.join(__dirname, 'react-app', 'index.html')
+        path.join(__dirname, 'react-vite', 'index.html')
     );
 });
 

@@ -21,20 +21,15 @@ const isProduction = environment === 'production';
 
 
 router.use(restoreUser);
-
-
- 
-    router.use(
-        csurf({
-            cookie: {
-                secure: isProduction,
-                sameSite: isProduction && "lax",
-                httpOnly: true
-            }
-        })
-    );
-
-
+router.use(
+    csurf({
+        cookie: {
+            secure: isProduction,
+            sameSite: isProduction && "lax",
+            httpOnly: true
+        }
+    })
+);
 router.use('/session', sessionRouter);
 router.use('/users', userRouter);
 router.use('/shelters', shelterRouter);
